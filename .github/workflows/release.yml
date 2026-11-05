@@ -32,8 +32,12 @@ jobs:
           extensions: dom, xml, xmlreader, xmlwriter, mbstring, openssl, sodium
           coverage: none
           tools: composer
-      - name: Install pinned development standards
+      - name: Validate development dependencies
+        run: composer validate --strict
+      - name: Install locked development standards
         run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Audit development dependencies
+        run: composer audit --locked --no-interaction
       - name: Check WordPress coding standards
         run: composer standards
       - name: Verify translations

@@ -81,6 +81,8 @@ This package contains plugin-owned integration code only. It does not bundle Wor
 
 The source of truth is [helmut-steiner/hsp-calendar-connection](https://github.com/helmut-steiner/hsp-calendar-connection). The WordPress folder and main file are **`hsp-calendar-connection/hsp-calendar-connection.php`**. Active classes, files, hooks, controls and settings use the `HSP`/`HSPCC` or `hsp`/`hspcc` prefixes. Only current HSP option names and credential formats are supported; managed-event identifiers remain unchanged.
 
+Install the locked development tools with `composer install`, then run `composer standards` and `composer audit --locked`. CI and release builds use the same reviewed lockfile and keep dependency security checks enabled. Development tools are excluded from the plugin ZIP.
+
 Run the portable tests from the repository root with PHP 8.2 or 8.4 using `php tests/run.php`; see [tests/README.md](tests/README.md). CI runs the synthetic suites on PHP 8.2 and 8.4 with DOM/XML, mbstring and authenticated-encryption extensions. The fixture runner uses newer reflection behavior; these CI runtimes do not change the plugin's declared PHP 8.0 minimum or establish that minimum's runtime compatibility. Optional installed-Amelia suites are skipped unless `HSPCC_AMELIA_PATH` points to a separately obtained installation. CI and releases do not download or redistribute Amelia, its vendor dependencies or license material. Passing synthetic tests does not establish live booking or calendar compatibility.
 
 Build an installable package offline:

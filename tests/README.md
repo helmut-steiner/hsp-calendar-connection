@@ -33,7 +33,7 @@ These files are portable copies of synthetic development fixtures. No site addre
 
 ## Standards and translation checks
 
-`composer install` installs pinned development tools; `composer standards` checks all distributed PHP against the WordPress ruleset. Narrow documented exceptions preserve native API names and security-critical protocol/database behavior. Runtime/development dependencies remain excluded from releases.
+`composer install` installs the reviewed development tools from `composer.lock`; `composer standards` checks all distributed PHP against the WordPress ruleset. Narrow documented exceptions preserve native API names and security-critical protocol/database behavior. Run `composer audit --locked` to check the locked tools for security advisories; CI and releases enforce that check. Keep Composer security blocking enabled when updating dependencies and commit the updated lockfile. Runtime/development dependencies remain excluded from releases.
 
 The rescheduling scope fixture runs independently under synthetic Amelia 9.9.1 and 9.9.2 contexts. It checks native pass-through outside enabled employee scope, configured source/target refusal, and canonical membership failures. This does not claim full native compatibility with 9.9.2.
 
