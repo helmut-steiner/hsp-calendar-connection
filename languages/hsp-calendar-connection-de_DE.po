@@ -1,65 +1,65 @@
 msgid ""
-msgstr "Project-Id-Version: HSP Calendar Connection 0.5.5\nReport-Msgid-Bugs-To: https://github.com/helmut-steiner/hsp-calendar-connection/issues\nPOT-Creation-Date: 2026-11-05 12:00+0100\nPO-Revision-Date: 2026-11-05 12:00+0100\nLanguage: de_DE\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\nX-Domain: hsp-calendar-connection\n"
+msgstr "Project-Id-Version: HSP Calendar Connection 0.5.6\nReport-Msgid-Bugs-To: https://github.com/helmut-steiner/hsp-calendar-connection/issues\nPOT-Creation-Date: 2026-11-05 12:00+0100\nPO-Revision-Date: 2026-11-05 12:00+0100\nLanguage: de_DE\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\nX-Domain: hsp-calendar-connection\n"
 
-#: hsp-calendar-connection.php:1462
+#: hsp-calendar-connection.php:1530
 msgid "(free/busy access unavailable)"
 msgstr "(Verfügbarkeitsabfrage nicht möglich)"
 
-#: hsp-calendar-connection.php:1469
+#: hsp-calendar-connection.php:1537
 msgid "(read only)"
 msgstr "(nur Lesezugriff)"
 
-#: hsp-calendar-connection.php:1442
+#: hsp-calendar-connection.php:1496
 msgid "A password is stored securely. Leave this field blank to keep it."
 msgstr "Ein Passwort ist sicher gespeichert. Lassen Sie dieses Feld leer, um es beizubehalten."
 
-#: hsp-calendar-connection.php:1480
+#: hsp-calendar-connection.php:1548
 msgid "A temporary connection test still requires cleanup."
 msgstr "Ein vorübergehender Verbindungstest muss noch bereinigt werden."
 
-#: hsp-calendar-connection.php:1397
+#: hsp-calendar-connection.php:1438
 msgid "Amelia employee"
 msgstr "Amelia-Mitarbeiter"
 
-#: hsp-calendar-connection.php:1475
+#: hsp-calendar-connection.php:1543
 msgid "Appointment storage is enabled."
 msgstr "Das Speichern von Terminen ist aktiviert."
 
-#: hsp-calendar-connection.php:1475
+#: hsp-calendar-connection.php:1543
 msgid "Appointment storage is not enabled yet."
 msgstr "Das Speichern von Terminen ist noch nicht aktiviert."
 
 #. translators: 1: Pending job count, 2: Retrying job count, 3: Conflict count.
-#: hsp-calendar-connection.php:1495
+#: hsp-calendar-connection.php:1563
 #, php-format
 msgid "Appointment sync: %1$d pending, %2$d retrying, %3$d conflicts."
 msgstr "Terminsynchronisierung: %1$d ausstehend, %2$d erneute Versuche, %3$d Konflikte."
 
-#: hsp-calendar-connection.php:1383
+#: hsp-calendar-connection.php:1423
 msgid "Availability could not be verified. Affected booking times will stay unavailable while the connection is failing."
 msgstr "Die Verfügbarkeit konnte nicht überprüft werden. Betroffene Buchungszeiten bleiben gesperrt, solange die Verbindungsstörung besteht."
 
-#: hsp-calendar-connection.php:1506
+#: hsp-calendar-connection.php:1585
 msgid "Block busy times from the selected calendars"
 msgstr "Belegte Zeiten aus den ausgewählten Kalendern sperren"
 
-#: hsp-calendar-connection.php:1420
+#: hsp-calendar-connection.php:1601
 msgid "Busy-time checks are enabled for this employee."
 msgstr "Die Prüfung belegter Zeiten ist für diesen Mitarbeiter aktiviert."
 
-#: hsp-calendar-connection.php:1420
+#: hsp-calendar-connection.php:1601
 msgid "Busy-time checks are not enabled for this employee."
 msgstr "Die Prüfung belegter Zeiten ist für diesen Mitarbeiter nicht aktiviert."
 
-#: hsp-calendar-connection.php:1441
+#: hsp-calendar-connection.php:1495
 msgid "CalDAV password"
 msgstr "CalDAV-Passwort"
 
-#: hsp-calendar-connection.php:1438
+#: hsp-calendar-connection.php:1492
 msgid "CalDAV server URL"
 msgstr "CalDAV-Server-URL"
 
-#: hsp-calendar-connection.php:1440
+#: hsp-calendar-connection.php:1494
 msgid "CalDAV username"
 msgstr "CalDAV-Benutzername"
 
@@ -67,7 +67,7 @@ msgstr "CalDAV-Benutzername"
 msgid "Calendar appointment could not be synchronized."
 msgstr "Der Kalendertermin konnte nicht synchronisiert werden."
 
-#: hsp-calendar-connection.php:657 hsp-calendar-connection.php:662 hsp-calendar-connection.php:671 hsp-calendar-connection.php:695 hsp-calendar-connection.php:698 hsp-calendar-connection.php:702
+#: hsp-calendar-connection.php:696 hsp-calendar-connection.php:701 hsp-calendar-connection.php:710 hsp-calendar-connection.php:734 hsp-calendar-connection.php:737 hsp-calendar-connection.php:741
 msgid "Calendar availability could not be verified."
 msgstr "Die Kalenderverfügbarkeit konnte nicht überprüft werden."
 
@@ -83,112 +83,116 @@ msgstr "Die Kalenderverfügbarkeit konnte nicht überprüft werden. Bitte versuc
 msgid "Calendar busy-time response could not be validated."
 msgstr "Die Kalenderantwort zu belegten Zeiten konnte nicht validiert werden."
 
-#: hsp-calendar-connection.php:1378
+#: hsp-calendar-connection.php:1418
 msgid "Calendar choices saved. Run Check connection to verify availability access."
 msgstr "Die Kalenderauswahl wurde gespeichert. Führen Sie „Verbindung prüfen“ aus, um den Zugriff auf die Verfügbarkeitsdaten zu überprüfen."
 
-#: hsp-calendar-connection.php:1376
+#: hsp-calendar-connection.php:1416
 msgid "Calendar discovery completed. Choose a calendar below."
 msgstr "Die Kalendersuche wurde abgeschlossen. Wählen Sie unten einen Kalender aus."
 
-#: includes/class-hspcc-sync-queue.php:1100
+#: includes/class-hspcc-sync-queue.php:1104
 msgid "Calendar queue state could not be validated."
 msgstr "Der Status der Kalenderwarteschlange konnte nicht validiert werden."
 
-#: hsp-calendar-connection.php:1453
+#: hsp-calendar-connection.php:1404
 msgid "Calendar routing"
 msgstr "Kalenderzuordnung"
 
-#: hsp-calendar-connection.php:1444
+#: hsp-calendar-connection.php:1498
 msgid "Changing this employee’s server or account resets their calendar choices and disables their runtime sync. Their managed bookings and unresolved jobs must be reconciled first. A different server requires password entry."
 msgstr "Wenn Sie den Server oder das Konto dieses Mitarbeiters ändern, wird seine Kalenderauswahl zurückgesetzt und seine laufende Synchronisierung deaktiviert. Seine verwalteten Buchungen und offenen Aufträge müssen zuerst abgeglichen werden. Für einen anderen Server muss das Passwort erneut eingegeben werden."
 
-#: hsp-calendar-connection.php:1516
+#: hsp-calendar-connection.php:1617
 msgid "Check connection"
 msgstr "Verbindung prüfen"
 
-#: hsp-calendar-connection.php:1377
+#: hsp-calendar-connection.php:1417
 msgid "Choose a calendar from the current discovery results."
 msgstr "Wählen Sie einen Kalender aus den aktuellen Suchergebnissen aus."
 
-#: hsp-calendar-connection.php:1465
+#: hsp-calendar-connection.php:1533
 msgid "Choose a destination later"
 msgstr "Zielkalender später auswählen"
 
-#: hsp-calendar-connection.php:1458
+#: hsp-calendar-connection.php:1526
 msgid "Choose one or more calendars, up to ten."
 msgstr "Wählen Sie einen oder mehrere Kalender aus, höchstens zehn."
 
-#: hsp-calendar-connection.php:1438
+#: hsp-calendar-connection.php:1403
 msgid "Connection settings"
 msgstr "Verbindungseinstellungen"
 
-#. translators: %s: Selected employee name.
-#: hsp-calendar-connection.php:1414
+#. translators: %1$s: Selected employee name.
+#: hsp-calendar-connection.php:1447
 #, php-format
 msgid "Connection settings, calendar choices and status below belong to %1$s."
 msgstr "Die folgenden Verbindungseinstellungen, die Kalenderauswahl und die Statusangaben gehören zu %1$s."
 
-#: hsp-calendar-connection.php:1417
+#: hsp-calendar-connection.php:1406
+msgid "Connection status"
+msgstr "Verbindungsstatus"
+
+#: hsp-calendar-connection.php:1455
 msgid "Create an employee in Amelia before setting up a calendar connection."
 msgstr "Legen Sie in Amelia einen Mitarbeiter an, bevor Sie eine Kalenderverbindung einrichten."
 
-#: hsp-calendar-connection.php:1472
+#: hsp-calendar-connection.php:1540
 msgid "Default calendar timezone"
 msgstr "Standardzeitzone des Kalenders"
 
-#: hsp-calendar-connection.php:1450
+#: hsp-calendar-connection.php:1504
 msgid "Discover calendars"
 msgstr "Kalender suchen"
 
-#: hsp-calendar-connection.php:1375
+#: hsp-calendar-connection.php:1415
 msgid "Discovery completed, but no calendar collections were found."
 msgstr "Die Suche wurde abgeschlossen, aber es wurden keine Kalendersammlungen gefunden."
 
-#: hsp-calendar-connection.php:1439
+#: hsp-calendar-connection.php:1493
 msgid "Employee"
 msgstr "Mitarbeiter"
 
-#: hsp-calendar-connection.php:1365 includes/class-hspcc-employee-context.php:148
+#: hsp-calendar-connection.php:1399 includes/class-hspcc-employee-context.php:148
 #, php-format
 msgid "Employee %1$d"
 msgstr "Mitarbeiter %1$d"
 
-#. translators: %d: Employee identifier.
-#: hsp-calendar-connection.php:1362
+#. translators: %1$d: Employee identifier.
+#: hsp-calendar-connection.php:1395
 #, php-format
 msgid "Employee %1$d (not available in Amelia)"
 msgstr "Mitarbeiter %1$d (in Amelia nicht verfügbar)"
 
-#: hsp-calendar-connection.php:407
+#: hsp-calendar-connection.php:441
 msgid "Enter a valid CalDAV username. Credentials were not changed."
 msgstr "Geben Sie einen gültigen CalDAV-Benutzernamen ein. Die Zugangsdaten wurden nicht geändert."
 
-#: hsp-calendar-connection.php:401
+#: hsp-calendar-connection.php:435
 msgid "Enter a valid HTTPS CalDAV server URL and Amelia employee ID. Connection settings were not changed."
 msgstr "Geben Sie eine gültige HTTPS-CalDAV-Server-URL und eine gültige Amelia-Mitarbeiter-ID ein. Die Verbindungseinstellungen wurden nicht geändert."
 
-#: hsp-calendar-connection.php:1381
+#: hsp-calendar-connection.php:1421
 msgid "Enter a valid calendar timezone, such as Europe/Vienna."
 msgstr "Geben Sie eine gültige Kalenderzeitzone ein, zum Beispiel Europe/Vienna."
 
-#: hsp-calendar-connection.php:433
+#: hsp-calendar-connection.php:467
 msgid "Enter the CalDAV password for the initial connection."
 msgstr "Geben Sie das CalDAV-Passwort für die erste Verbindung ein."
 
-#: hsp-calendar-connection.php:417
+#: hsp-calendar-connection.php:451
 msgid "Enter the password for the new CalDAV server. A saved password is never forwarded automatically to a different server."
 msgstr "Geben Sie das Passwort für den neuen CalDAV-Server ein. Ein gespeichertes Passwort wird niemals automatisch an einen anderen Server weitergegeben."
 
-#: hsp-calendar-connection.php:1380
+#: hsp-calendar-connection.php:1420
 msgid "Existing managed appointments must be migrated before changing the booking destination."
 msgstr "Bestehende verwaltete Termine müssen migriert werden, bevor Sie den Zielkalender für Buchungen ändern."
 
-#: hsp-calendar-connection.php:1429
+#: hsp-calendar-connection.php:1610
 msgid "Failed; please check the connection."
 msgstr "Fehlgeschlagen; bitte prüfen Sie die Verbindung."
 
-#: hsp-calendar-connection.php:1084
+#: hsp-calendar-connection.php:1123
 msgid "Forbidden."
 msgstr "Zugriff verweigert."
 
@@ -196,21 +200,21 @@ msgstr "Zugriff verweigert."
 msgid "HSP calendar retry (five minutes)"
 msgstr "HSP-Kalender: erneuter Versuch (fünf Minuten)"
 
-#: hsp-calendar-connection.php:1422
+#: hsp-calendar-connection.php:1603
 msgid "If the destination is also checked, this employee’s managed entries are excluded from their external busy periods; Amelia checks those appointments itself. Other employees’ entries remain busy."
 msgstr "Wenn der Zielkalender ebenfalls ausgewählt ist, werden die verwalteten Einträge dieses Mitarbeiters von seinen externen belegten Zeiten ausgenommen; Amelia prüft diese Termine selbst. Einträge anderer Mitarbeiter gelten weiterhin als belegt."
 
 #. translators: %s: Date and time of the last availability check.
-#: hsp-calendar-connection.php:1428
+#: hsp-calendar-connection.php:1609
 #, php-format
 msgid "Last availability check: %1$s"
 msgstr "Letzte Verfügbarkeitsprüfung: %1$s"
 
-#: hsp-calendar-connection.php:1442
+#: hsp-calendar-connection.php:1496
 msgid "No password is stored."
 msgstr "Es ist kein Passwort gespeichert."
 
-#: hsp-calendar-connection.php:1429
+#: hsp-calendar-connection.php:1610
 msgid "Passed."
 msgstr "Erfolgreich."
 
@@ -230,83 +234,91 @@ msgstr "Private CalDAV-Prüfung belegter Zeiten und Übertragung von Amelia-Term
 msgid "Private CalDAV busy-time checks and Amelia appointment writeback."
 msgstr "Private CalDAV-Prüfung belegter Zeiten und Übertragung von Amelia-Terminen in den Kalender."
 
-#: hsp-calendar-connection.php:1458
+#: hsp-calendar-connection.php:1526
 msgid "Read busy times from"
 msgstr "Belegte Zeiten lesen aus"
 
-#: hsp-calendar-connection.php:1488
+#: hsp-calendar-connection.php:1556
 msgid "Remove test event"
 msgstr "Testtermin entfernen"
 
-#: hsp-calendar-connection.php:421
+#: hsp-calendar-connection.php:455
 msgid "Remove the temporary test event before replacing the saved password."
 msgstr "Entfernen Sie den vorübergehenden Testtermin, bevor Sie das gespeicherte Passwort ersetzen."
 
-#: hsp-calendar-connection.php:413
+#: hsp-calendar-connection.php:447
 msgid "Resolve managed appointments, pending sync jobs and temporary tests before changing the server, account or employee. Connection settings were not changed."
 msgstr "Klären Sie verwaltete Termine, ausstehende Synchronisierungsaufträge und vorübergehende Tests, bevor Sie den Server, das Konto oder den Mitarbeiter ändern. Die Verbindungseinstellungen wurden nicht geändert."
 
-#: hsp-calendar-connection.php:1502
+#: hsp-calendar-connection.php:1405
 msgid "Runtime settings"
 msgstr "Betriebseinstellungen"
 
-#: hsp-calendar-connection.php:1384
+#: hsp-calendar-connection.php:1424
 msgid "Runtime settings could not be saved."
 msgstr "Die Betriebseinstellungen konnten nicht gespeichert werden."
 
-#: hsp-calendar-connection.php:1385
+#: hsp-calendar-connection.php:1425
 msgid "Runtime settings saved."
 msgstr "Die Betriebseinstellungen wurden gespeichert."
 
-#: hsp-calendar-connection.php:1473
+#: hsp-calendar-connection.php:1517 hsp-calendar-connection.php:1579 hsp-calendar-connection.php:1599
+msgid "Save a connection and discover calendars first."
+msgstr "Speichern Sie zuerst eine Verbindung und suchen Sie nach Kalendern."
+
+#: hsp-calendar-connection.php:1541
 msgid "Save calendar choices"
 msgstr "Kalenderauswahl speichern"
 
-#: hsp-calendar-connection.php:1445
+#: hsp-calendar-connection.php:1499
 msgid "Save connection"
 msgstr "Verbindung speichern"
 
-#: hsp-calendar-connection.php:1508
+#: hsp-calendar-connection.php:1587
 msgid "Save runtime settings"
 msgstr "Betriebseinstellungen speichern"
 
-#: hsp-calendar-connection.php:1369
+#: hsp-calendar-connection.php:1409
 msgid "Saved credentials are unavailable. Enter or replace them, then try again."
 msgstr "Die gespeicherten Zugangsdaten sind nicht verfügbar. Geben Sie sie ein oder ersetzen Sie sie und versuchen Sie es erneut."
 
-#: hsp-calendar-connection.php:428
+#: hsp-calendar-connection.php:462
 msgid "Secure credential storage is unavailable. Credentials were not changed."
 msgstr "Die sichere Speicherung von Zugangsdaten ist nicht verfügbar. Die Zugangsdaten wurden nicht geändert."
 
-#: hsp-calendar-connection.php:155
+#: hsp-calendar-connection.php:157 hsp-calendar-connection.php:1458
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: hsp-calendar-connection.php:1498
+#: hsp-calendar-connection.php:1444
+msgid "Show employee"
+msgstr "Mitarbeiter anzeigen"
+
+#: hsp-calendar-connection.php:1566
 msgid "Some appointment entries need attention. Saved jobs are retained for recovery."
 msgstr "Einige Termineinträge erfordern Ihre Aufmerksamkeit. Gespeicherte Aufträge bleiben zur Wiederherstellung erhalten."
 
-#: hsp-calendar-connection.php:1507
+#: hsp-calendar-connection.php:1586
 msgid "Store Amelia appointments in the selected destination"
 msgstr "Amelia-Termine im ausgewählten Zielkalender speichern"
 
-#: hsp-calendar-connection.php:1464
+#: hsp-calendar-connection.php:1532
 msgid "Store Amelia bookings in"
 msgstr "Amelia-Buchungen speichern in"
 
-#: hsp-calendar-connection.php:1424
+#: hsp-calendar-connection.php:1605
 msgid "Supported on Amelia 9.9.1: individual fixed-duration free appointments and capacity-one fixed-price appointments with on-site payment. Customer rescheduling requires the same service, employee and location. Online payments, packages, recurring appointments and other reassignment flows are not supported."
 msgstr "Unterstützt mit Amelia 9.9.1: kostenlose Einzeltermine mit fester Dauer sowie Termine mit Festpreis, einer Kapazität von einer Person und Zahlung vor Ort. Bei Terminverschiebungen durch Kunden müssen Dienstleistung, Mitarbeiter und Standort gleich bleiben. Onlinezahlungen, Pakete, wiederkehrende Termine und andere Neuzuordnungen werden nicht unterstützt."
 
-#: hsp-calendar-connection.php:1390
+#: hsp-calendar-connection.php:1430
 msgid "Temporary event cleanup completed. Successful create/update verification now permits appointment storage."
 msgstr "Der vorübergehende Testtermin wurde entfernt. Die erfolgreiche Prüfung des Erstellens und Aktualisierens erlaubt jetzt das Speichern von Terminen."
 
-#: hsp-calendar-connection.php:1488
+#: hsp-calendar-connection.php:1556
 msgid "Test write access"
 msgstr "Schreibzugriff testen"
 
-#: hsp-calendar-connection.php:1386
+#: hsp-calendar-connection.php:1426
 msgid "Test write access and remove the temporary event before enabling appointment storage."
 msgstr "Testen Sie den Schreibzugriff und entfernen Sie den vorübergehenden Testtermin, bevor Sie das Speichern von Terminen aktivieren."
 
@@ -318,7 +330,7 @@ msgstr "Diese Zeit ist nicht mehr verfügbar. Bitte wählen Sie eine andere Zeit
 msgid "The appointment could not be prepared for calendar synchronization."
 msgstr "Der Termin konnte nicht für die Kalendersynchronisierung vorbereitet werden."
 
-#: hsp-calendar-connection.php:1370
+#: hsp-calendar-connection.php:1410
 msgid "The calendar server could not be reached or returned an unsupported response."
 msgstr "Der Kalenderserver war nicht erreichbar oder hat eine nicht unterstützte Antwort zurückgegeben."
 
@@ -326,70 +338,70 @@ msgstr "Der Kalenderserver war nicht erreichbar oder hat eine nicht unterstützt
 msgid "The calendar server request could not be completed safely."
 msgstr "Die Anfrage an den Kalenderserver konnte nicht sicher abgeschlossen werden."
 
-#: hsp-calendar-connection.php:1421
+#: hsp-calendar-connection.php:1602
 msgid "The checked calendars block availability. A separate destination receives Amelia appointment entries when storage is enabled. Slot displays may use a validated result for up to 60 seconds; appointments receive a fresh availability check before saving."
 msgstr "Die ausgewählten Kalender sperren belegte Zeiten. Ein separater Zielkalender erhält Amelia-Termineinträge, wenn das Speichern aktiviert ist. Die Anzeige von Zeitfenstern kann ein validiertes Ergebnis bis zu 60 Sekunden lang verwenden; vor dem Speichern von Terminen wird die Verfügbarkeit erneut geprüft."
 
-#: hsp-calendar-connection.php:1382
+#: hsp-calendar-connection.php:1422
 msgid "The free/busy availability check passed."
 msgstr "Die Verfügbarkeitsprüfung für freie und belegte Zeiten war erfolgreich."
 
-#: hsp-calendar-connection.php:1477
+#: hsp-calendar-connection.php:1545
 msgid "The selected destination passed create, update and cleanup checks."
 msgstr "Der ausgewählte Zielkalender hat die Prüfungen zum Erstellen, Aktualisieren und Entfernen bestanden."
 
-#: hsp-calendar-connection.php:1373
+#: hsp-calendar-connection.php:1413
 msgid "The server did not return a supported same-origin calendar address."
 msgstr "Der Server hat keine unterstützte Kalenderadresse mit demselben Ursprung zurückgegeben."
 
-#: hsp-calendar-connection.php:1371
+#: hsp-calendar-connection.php:1411
 msgid "The server rejected authentication or access. Check the CalDAV credentials."
 msgstr "Der Server hat die Anmeldung oder den Zugriff abgelehnt. Prüfen Sie die CalDAV-Zugangsdaten."
 
-#: hsp-calendar-connection.php:1372
+#: hsp-calendar-connection.php:1412
 msgid "The server requested a redirect. Redirects are disabled for this connection."
 msgstr "Der Server hat eine Weiterleitung angefordert. Weiterleitungen sind für diese Verbindung deaktiviert."
 
-#: hsp-calendar-connection.php:1374
+#: hsp-calendar-connection.php:1414
 msgid "The server returned unsupported discovery data."
 msgstr "Der Server hat nicht unterstützte Daten zur Kalendersuche zurückgegeben."
 
-#: hsp-calendar-connection.php:1389
+#: hsp-calendar-connection.php:1429
 msgid "The temporary event could not be removed. Check the connection and retry cleanup."
 msgstr "Der vorübergehende Testtermin konnte nicht entfernt werden. Prüfen Sie die Verbindung und versuchen Sie das Entfernen erneut."
 
-#: hsp-calendar-connection.php:1388
+#: hsp-calendar-connection.php:1428
 msgid "The temporary event was created and updated. Remove the test event to complete verification."
 msgstr "Der vorübergehende Testtermin wurde erstellt und aktualisiert. Entfernen Sie den Testtermin, um die Prüfung abzuschließen."
 
-#: hsp-calendar-connection.php:1387
+#: hsp-calendar-connection.php:1427
 msgid "The write test could not be completed. If a temporary test is pending, remove it before trying again."
 msgstr "Der Schreibtest konnte nicht abgeschlossen werden. Falls ein vorübergehender Testtermin aussteht, entfernen Sie ihn, bevor Sie es erneut versuchen."
 
-#: hsp-calendar-connection.php:1487
+#: hsp-calendar-connection.php:1555
 msgid "The write test creates and updates a temporary event containing no customer details. Remove it to finish verification."
 msgstr "Der Schreibtest erstellt und aktualisiert einen vorübergehenden Termin ohne Kundendaten. Entfernen Sie ihn, um die Prüfung abzuschließen."
 
-#: hsp-calendar-connection.php:1379
+#: hsp-calendar-connection.php:1419
 msgid "This login does not have write access to the chosen booking calendar."
 msgstr "Dieses Konto hat keinen Schreibzugriff auf den ausgewählten Buchungskalender."
 
-#: hsp-calendar-connection.php:1462 hsp-calendar-connection.php:1469
+#: hsp-calendar-connection.php:1530 hsp-calendar-connection.php:1537
 msgid "Unnamed calendar"
 msgstr "Unbenannter Kalender"
 
-#: hsp-calendar-connection.php:1438
+#: hsp-calendar-connection.php:1492
 msgid "Use the direct HTTPS CalDAV endpoint. Discovery stays on this server and port; redirects and private network addresses are blocked. Use a DNS hostname rather than an IPv6 literal."
 msgstr "Verwenden Sie den direkten HTTPS-CalDAV-Endpunkt. Die Suche bleibt auf diesem Server und Port; Weiterleitungen und private Netzwerkadressen werden blockiert. Verwenden Sie einen DNS-Hostnamen statt einer ausgeschriebenen IPv6-Adresse."
 
-#: hsp-calendar-connection.php:1471
+#: hsp-calendar-connection.php:1539
 msgid "Use the same CalDAV login for both. Appointment changes and cancellations are managed in Amelia."
 msgstr "Verwenden Sie für beide dieselben CalDAV-Zugangsdaten. Terminänderungen und Stornierungen werden in Amelia verwaltet."
 
-#: hsp-calendar-connection.php:1472
+#: hsp-calendar-connection.php:1540
 msgid "Used for floating and all-day entries when the server does not publish a calendar timezone. A new connection starts with the WordPress site timezone."
 msgstr "Wird für Einträge ohne Zeitzonenangabe und ganztägige Einträge verwendet, wenn der Server keine Kalenderzeitzone veröffentlicht. Eine neue Verbindung verwendet zunächst die Zeitzone der WordPress-Website."
 
-#: hsp-calendar-connection.php:1423
+#: hsp-calendar-connection.php:1604
 msgid "Working hours and public booking availability are managed separately in Amelia."
 msgstr "Arbeitszeiten und die Verfügbarkeit für öffentliche Buchungen werden separat in Amelia verwaltet."

@@ -701,12 +701,16 @@ final class HSPCC_Sync_Queue {
 	/**
 	 * Read or create the stable employee-scoped event namespace.
 	 *
+	 * @param bool $create Whether a missing namespace may be initialized by a runtime operation.
 	 * @return string
 	 */
-	public static function site_uuid(): string {
+	public static function site_uuid( bool $create = true ): string {
 		$site = HSP_Calendar_Connection::private_option( self::SITE, '' );
 		if ( '' !== $site ) {
 			return self::uuid( $site ) ? $site : ''; }
+		if ( ! $create ) {
+			return '';
+		}
 		// WordPress add_option uses an upsert under the hood, so a separate
 		// advisory lock also serializes the first creation of site identity.
 		$name = self::advisory( 'site_identity' );

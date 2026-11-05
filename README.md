@@ -1,6 +1,6 @@
 # HSP Calendar Connection
 
-Version 0.5.5. Private CalDAV busy-time checks and Amelia appointment writeback, with one connection per employee.
+Version 0.5.6. Private CalDAV busy-time checks and Amelia appointment writeback, with one connection per employee.
 
 HSP Calendar Connection is a separate WordPress plugin. Amelia remains responsible for services, appointments, working hours and notifications. The plugin does not provide appointment availability or replace Amelia's booking interface.
 
@@ -18,7 +18,7 @@ Amelia and its vendor dependencies are not included or redistributed in this pac
 
 1. Install the plugin folder or ZIP through WordPress and activate it.
 2. Open **Settings → HSP Calendar Connection** as an administrator.
-3. Open the named Amelia employee tab. The connection settings, calendar choices, feature controls and status below follow that selection. Create employees in Amelia first.
+3. Choose the named Amelia employee from the dropdown. Open Connection settings, Calendar routing, Runtime settings or Connection status to manage that employee; the dropdown remains available above the tabs. Create employees in Amelia first.
 4. Enter that employee's HTTPS CalDAV address and credentials. Enter passwords only in this private interface; the password field stays blank after saving. Discover calendars, then select up to ten busy sources and, optionally, one write destination on that connection.
 5. Set the fallback timezone if needed. It initially follows the WordPress site timezone, with UTC as fallback; an already saved selection is preserved. A published calendar timezone takes priority.
 6. Check the read connection. For writeback, click **Test write access** to create/update a temporary event containing no customer data, then **Remove test event** to complete cleanup. Finish both steps before enabling writing.
@@ -35,7 +35,7 @@ Requests use TLS verification, stay on the configured HTTPS origin and follow no
 
 Use a DNS hostname. IPv6 literal addresses are not supported.
 
-Changing an employee's CalDAV address or account is blocked while that connection has managed resources, unresolved queue state or a probe requiring reconciliation. A safe connection change clears that employee's discovery/cache health and disables both features, requiring fresh setup. Destination changes similarly require reconciliation; no automatic connection or destination migration tool is provided. Switching the employee tabs only changes the settings being displayed.
+Changing an employee's CalDAV address or account is blocked while that connection has managed resources, unresolved queue state or a probe requiring reconciliation. A safe connection change clears that employee's discovery/cache health and disables both features, requiring fresh setup. Destination changes similarly require reconciliation; no automatic connection or destination migration tool is provided. Changing the employee dropdown only changes the employee being displayed; the section tab stays selected.
 
 Credentials use authenticated encryption tied to WordPress salts. A blank password preserves an existing secret only on the same origin; a different origin requires explicit password entry. Password rotation keeps calendar routing but disables writing and invalidates its proof: repeat the write test and cleanup before enabling it again. Salt rotation or moving options to different salts requires password re-entry. Keep connection options and credentials out of Git, exports and support logs.
 
@@ -88,18 +88,20 @@ Run the portable tests from the repository root with PHP 8.2 or 8.4 using `php t
 Build an installable package offline:
 
 ```text
-python tools/build-release.py --tag v0.5.5
+python tools/build-release.py --tag v0.5.6
 ```
 
-The builder checks the tag against the plugin header and readme stable tag. It writes `dist/hsp-calendar-connection-0.5.5.zip` plus a SHA-256 file manifest using an explicit runtime-file allowlist. The archive includes the license, contribution instructions and security policy; it excludes tests, tools, CI files, vendor dependencies and private site data. The `.distignore` file documents exclusions for other packaging tools; the Python allowlist is authoritative.
+The builder checks the tag against the plugin header and readme stable tag. It writes `dist/hsp-calendar-connection-0.5.6.zip` plus a SHA-256 file manifest using an explicit runtime-file allowlist. The archive includes the license, contribution instructions and security policy; it excludes tests, tools, CI files, vendor dependencies and private site data. The `.distignore` file documents exclusions for other packaging tools; the Python allowlist is authoritative.
 
 For each release, update the main plugin `Version` header and `HSPCC_VERSION` constant, `readme.txt` stable tag, this version notice and both changelogs; run tests and build the ZIP before publishing. The builder checks that the runtime constant matches the header. Create a matching `v<version>` tag and GitHub Release in this repository. The Release workflow checks out that tag, reruns the portable tests, verifies metadata and uploads the exact `hsp-calendar-connection-<version>.zip` asset plus its manifest. Manual workflow dispatch also requires an existing matching tag and release. Publishing a release or pushing a tag is a separate maintainer action; repository setup alone does not publish one.
 
 ## Migration and WordPress updates
 
-Version 0.5.5 supports fresh installations and existing connections already using current HSP settings, `busySelected` routing, version-2 queue records and `s2:`/`o2:` encrypted credentials. Historical option-name imports, configuration upgrades and old encrypted-password readers have been removed. Installing 0.5.4 alone did not rewrite old encrypted passwords; convert any remaining old credentials with that version before replacing it. Keep a private options backup and the previous ZIP for recovery.
+The employee dropdown selects whose connection is being edited. The four section tabs organize that employee's connection, routing, runtime controls and status. Connection settings opens by default; changing employees preserves the current section. Saving forms and running checks returns to the relevant section; successful discovery opens Calendar routing. Switching a tab never saves an incomplete form or contacts the calendar server.
 
-Install the new ZIP manually, then verify the version, employee tabs, calendar choices and feature state. Keep only one active plugin copy. Deactivation preserves private settings, jobs and mappings. Code rollback does not undo later calendar writes; review unresolved jobs before rollback.
+Version 0.5.6 supports fresh installations and existing connections already using current HSP settings, `busySelected` routing, version-2 queue records and `s2:`/`o2:` encrypted credentials. Historical option-name imports, configuration upgrades and old encrypted-password readers have been removed. Installing 0.5.4 alone did not rewrite old encrypted passwords; convert any remaining old credentials with that version before replacing it. Keep a private options backup and the previous ZIP for recovery.
+
+Install the new ZIP manually, then verify the version, employee dropdown, section tabs, calendar choices and feature state. Keep only one active plugin copy. Deactivation preserves private settings, jobs and mappings. Code rollback does not undo later calendar writes; review unresolved jobs before rollback.
 
 The new plugin integrates **public GitHub Releases** with WordPress's normal update checks and plugin details. It accepts the matching `hsp-calendar-connection-<version>.zip` release asset with its `hsp-calendar-connection/` root. GitHub source archives and arbitrary ZIP assets are not update packages. The updater does not authenticate private repositories or release downloads. A repository without a suitable published release has no update to offer.
 

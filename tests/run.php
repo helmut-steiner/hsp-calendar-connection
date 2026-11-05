@@ -124,6 +124,7 @@ $jobs = [
     ['endpoint/origin policy', 'hspcc-endpoint-config-test.php', [], []],
     ['actual-main settings/runtime', 'hspcc-connection-settings-test.php', [], []],
     ['actual-main employee settings/isolation', 'hspcc-employee-settings-test.php', [], []],
+    ['read-only settings views', 'hspcc-view-state-test.php', [], []],
 ];
 if (function_exists('openssl_encrypt') && in_array('aes-256-gcm', openssl_get_cipher_methods(), true)) {
     $fallbackDisabled = implode(',', array_unique(array_filter(array_merge(

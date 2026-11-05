@@ -3,7 +3,7 @@
  * Plugin Name: HSP Calendar Connection
  * Plugin URI: https://github.com/helmut-steiner/hsp-calendar-connection
  * Description: Private CalDAV busy-time checks and Amelia appointment writeback.
- * Version: 0.5.5
+ * Version: 0.5.6
  * Requires at least: 5.8
  * Requires PHP: 8.0
  * Author: Helmut Steiner
@@ -18,7 +18,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'HSPCC_VERSION', '0.5.5' );
+define( 'HSPCC_VERSION', '0.5.6' );
 require_once __DIR__ . '/includes/class-hspcc-updater.php';
 HSPCC_Updater::init( __FILE__ );
 
@@ -34,6 +34,8 @@ final class HSP_Calendar_Connection {
 	const TIMEZONE     = 'hsp_calendar_fallback_timezone';
 	const PROBE        = 'hsp_calendar_write_probe';
 	const WRITE_HEALTH = 'hsp_calendar_write_health';
+	/** Server-rendered settings sections; unrelated to employee execution scope. */
+	private const TABS = array( 'connection', 'calendars', 'runtime', 'status' );
 	/**
 	 * Last sanitized value for the Settings API's repeated callback.
 	 *
@@ -296,16 +298,48 @@ final class HSP_Calendar_Connection {
 	}
 
 	/**
-	 * Build the fixed hidden employee field with an integer-only identifier.
+	 * Build hidden fields preserving the employee and allowlisted settings section.
 	 *
 	 * @return string Result of the operation.
 	 */
 	private static function employee_input() {
-		return '<input type="hidden" name="hspcc_employee" value="' . (int) self::employee_id() . '">';
+		return '<input type="hidden" name="hspcc_employee" value="' . (int) self::employee_id() . '">' .
+			'<input type="hidden" name="hspcc_tab" value="' . esc_attr( self::requested_tab() ) . '">';
 	}
 
 	/**
-	 * Enqueue wrapping employee-tab styles only on this plugin settings page.
+	 * Resolve a read-only section independently from the employee connection scope.
+	 *
+	 * @return string An allowlisted section, defaulting to connection settings.
+	 */
+	private static function requested_tab() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Navigation only; the unslashed value must exactly match the fixed section allowlist below.
+		$tab = isset( $_POST['hspcc_tab'] ) ? wp_unslash( $_POST['hspcc_tab'] ) : ( isset( $_GET['hspcc_tab'] ) ? wp_unslash( $_GET['hspcc_tab'] ) : '' );
+		return is_string( $tab ) && in_array( $tab, self::TABS, true ) ? $tab : 'connection';
+	}
+
+	/**
+	 * Build a clean settings URL for the current employee and a validated section.
+	 *
+	 * @param string $tab Requested section slug.
+	 * @param string $status Optional notice key; successful discovery opens calendar routing.
+	 * @return string Same-origin administrator URL with no unrelated query parameters.
+	 */
+	private static function settings_url( $tab, $status = '' ) {
+		$tab  = 'discovered' === $status ? 'calendars' : $tab;
+		$args = array(
+			'page'           => self::PAGE,
+			'hspcc_employee' => self::employee_id(),
+			'hspcc_tab'      => in_array( $tab, self::TABS, true ) ? $tab : 'connection',
+		);
+		if ( is_string( $status ) && '' !== $status ) {
+			$args['hspcc_status'] = sanitize_key( $status );
+		}
+		return add_query_arg( $args, admin_url( 'options-general.php' ) );
+	}
+
+	/**
+	 * Enqueue responsive section navigation and native employee selector styles.
 	 *
 	 * @param string $hook Current administrator screen hook.
 	 * @return void No return value.
@@ -611,9 +645,10 @@ final class HSP_Calendar_Connection {
 	 * Build an opaque source-cache namespace without exposing credentials or URLs.
 	 *
 	 * @param string $key Opaque identifier of a discovered calendar.
+	 * @param bool   $create_namespace Whether runtime callers may initialize the event namespace.
 	 * @return string Result of the operation.
 	 */
-	public static function source_identity( $key ) {
+	public static function source_identity( $key, bool $create_namespace = true ) {
 		$credentials = self::credentials();
 		$discovery   = self::discovery();
 		$calendar    = $discovery['calendars'][ $key ] ?? null;
@@ -621,23 +656,27 @@ final class HSP_Calendar_Connection {
 			self::provider_id() < 1 ) {
 			return ''; }
 		$overlap   = ( $discovery['writeSelected'] ?? '' ) === $key;
-		$namespace = $overlap && class_exists( 'HSPCC_Sync_Queue' ) ? HSPCC_Sync_Queue::site_uuid() : '';
-		$zone      = $overlap ? self::fallback_timezone() : '';
+		$namespace = $overlap && class_exists( 'HSPCC_Sync_Queue' ) ? HSPCC_Sync_Queue::site_uuid( $create_namespace ) : '';
+		if ( $overlap && ! $create_namespace && '' === $namespace ) {
+			return '';
+		}
+		$zone = $overlap ? self::fallback_timezone() : '';
 		return hash_hmac( 'sha256', self::fingerprint( $credentials ) . '|' . $key . '|' . $namespace . '|' . (int) $overlap . '|' . $zone, wp_salt( 'nonce' ) );
 	}
 
 	/**
 	 * Build a cache identity for the union of selected busy sources.
 	 *
+	 * @param bool $create_namespace Whether runtime callers may initialize the event namespace.
 	 * @return string Result of the operation.
 	 */
-	public static function connection_identity() {
+	public static function connection_identity( bool $create_namespace = true ) {
 		$keys = self::source_keys();
 		if ( ! $keys ) {
 			return ''; }
 		$identities = array();
 		foreach ( $keys as $key ) {
-			$id = self::source_identity( $key );
+			$id = self::source_identity( $key, $create_namespace );
 			if ( '' === $id ) {
 				return '';
 			} $identities[] = $id; }
@@ -1092,16 +1131,7 @@ final class HSP_Calendar_Connection {
 	 * @return never No return value.
 	 */
 	private static function finish( $status ) {
-		wp_safe_redirect(
-			add_query_arg(
-				array(
-					'page'           => self::PAGE,
-					'hspcc_status'   => $status,
-					'hspcc_employee' => self::employee_id(),
-				),
-				admin_url( 'options-general.php' )
-			)
-		);
+		wp_safe_redirect( self::settings_url( self::requested_tab(), $status ) );
 		exit;
 	}
 
@@ -1327,44 +1357,54 @@ final class HSP_Calendar_Connection {
 	 * @return array Result of the operation.
 	 */
 	public static function status() {
-		$identity = self::connection_identity();
+		$identity = self::connection_identity( false );
+		$sources  = self::source_keys();
 		$health   = self::private_option( self::HEALTH, array() );
 		$current  = is_array( $health ) && '' !== $identity && isset( $health['identity'] ) &&
 			is_string( $health['identity'] ) && hash_equals( $identity, $health['identity'] );
 		return array(
 			'enabled'             => in_array( self::private_option( self::BLOCKING, false ), array( true, 1, '1' ), true ),
-			'configured'          => '' !== $identity,
+			'configured'          => self::provider_id() > 0 && ! empty( $sources ),
 			'employeeId'          => self::employee_id(),
 			'providerId'          => self::provider_id(),
 			'lastCheckOk'         => $current ? (bool) ( $health['ok'] ?? false ) : null,
 			'checkedAt'           => $current ? (int) ( $health['checkedAt'] ?? 0 ) : 0,
 			'periodCount'         => $current && ! empty( $health['ok'] ) ? (int) ( $health['periodCount'] ?? 0 ) : null,
 			'displayCacheSeconds' => HSPCC_Busy_Time::DISPLAY_TTL,
-			'busyCalendarCount'   => count( self::source_keys() ),
+			'busyCalendarCount'   => count( $sources ),
 			'writeTargetSelected' => self::write_configuration()['selected'],
 			'writingEnabled'      => in_array( self::private_option( self::WRITING, false ), array( true, 1, '1' ), true ),
 		);
 	}
 
 	/**
-	 * Render the translated administrator interface with contextual output escaping.
+	 * Render one server-selected settings section for the selected employee.
 	 *
 	 * @return void No return value.
 	 */
 	public static function page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			return; }
+			return;
+		}
 		self::select_requested_employee();
+		$tab       = self::requested_tab();
 		$employees = HSPCC_Employee_Context::choices();
 		foreach ( self::configured_employees() as $employee ) {
 			if ( ! isset( $employees[ $employee ] ) ) {
-				/* translators: %d: Employee identifier. */
-				$employees[ $employee ] = sprintf( __( 'Employee %1$d (not available in Amelia)', 'hsp-calendar-connection' ), $employee ); }
+				/* translators: %1$d: Employee identifier. */
+				$employees[ $employee ] = sprintf( __( 'Employee %1$d (not available in Amelia)', 'hsp-calendar-connection' ), $employee );
+			}
 		}
-		/* translators: %d: Employee identifier. */
+		/* translators: %1$d: Employee identifier. */
 		$employee_name = $employees[ self::employee_id() ] ?? sprintf( __( 'Employee %1$d', 'hsp-calendar-connection' ), self::employee_id() );
-		$credentials   = self::credentials();
+		$connection    = self::status();
 		$discovery     = self::discovery();
+		$tabs          = array(
+			'connection' => __( 'Connection settings', 'hsp-calendar-connection' ),
+			'calendars'  => __( 'Calendar routing', 'hsp-calendar-connection' ),
+			'runtime'    => __( 'Runtime settings', 'hsp-calendar-connection' ),
+			'status'     => __( 'Connection status', 'hsp-calendar-connection' ),
+		);
 		$messages      = array(
 			'credentials'    => __( 'Saved credentials are unavailable. Enter or replace them, then try again.', 'hsp-calendar-connection' ),
 			'connection'     => __( 'The calendar server could not be reached or returned an unsupported response.', 'hsp-calendar-connection' ),
@@ -1390,32 +1430,173 @@ final class HSP_Calendar_Connection {
 			'probe_cleaned'  => __( 'Temporary event cleanup completed. Successful create/update verification now permits appointment storage.', 'hsp-calendar-connection' ),
 		);
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only, sanitized notice key resolved through the fixed message map.
-		$status     = isset( $_GET['hspcc_status'] ) && is_string( $_GET['hspcc_status'] ) ? sanitize_key( wp_unslash( $_GET['hspcc_status'] ) ) : '';
-		$connection = self::status();
+		$status = isset( $_GET['hspcc_status'] ) && is_string( $_GET['hspcc_status'] ) ? sanitize_key( wp_unslash( $_GET['hspcc_status'] ) ) : '';
 		echo '<div class="wrap"><h1>HSP Calendar Connection</h1>';
 		if ( $employees ) {
-			echo '<nav class="nav-tab-wrapper hspcc-employee-tabs" aria-label="' . esc_attr__( 'Amelia employee', 'hsp-calendar-connection' ) . '">';
+			echo '<form class="hspcc-employee-selector" method="get" action="' . esc_url( admin_url( 'options-general.php' ) ) . '">';
+			echo '<input type="hidden" name="page" value="' . esc_attr( self::PAGE ) . '"><input type="hidden" name="hspcc_tab" value="' . esc_attr( $tab ) . '">';
+			echo '<p><label for="hspcc-employee"><strong>' . esc_html__( 'Amelia employee', 'hsp-calendar-connection' ) . '</strong></label></p>';
+			echo '<div class="hspcc-employee-controls"><select id="hspcc-employee" name="hspcc_employee">';
 			foreach ( $employees as $employee => $name ) {
-				$employee_url = add_query_arg(
-					array(
-						'page'           => self::PAGE,
-						'hspcc_employee' => (int) $employee,
-					),
-					admin_url( 'options-general.php' )
-				);
-				$is_current   = self::employee_id() === (int) $employee;
-				echo '<a class="nav-tab' . ( $is_current ? ' nav-tab-active' : '' ) . '" href="' . esc_url( $employee_url ) . '"' .
-					( $is_current ? ' aria-current="page"' : '' ) . '><bdi>' . esc_html( $name . ' (#' . $employee . ')' ) . '</bdi></a>';
+				echo '<option value="' . (int) $employee . '"' . selected( self::employee_id(), (int) $employee, false ) . '>' . esc_html( $name . ' (#' . (int) $employee . ')' ) . '</option>';
 			}
-			echo '</nav>';
+			echo '</select>';
+			submit_button( __( 'Show employee', 'hsp-calendar-connection' ), 'secondary', 'hspcc-show-employee', false );
+			echo '</div></form><p class="hspcc-employee-context">';
+			/* translators: %1$s: Selected employee name. */
+			printf( esc_html__( 'Connection settings, calendar choices and status below belong to %1$s.', 'hsp-calendar-connection' ), esc_html( $employee_name ) );
+			echo '</p>';
 		}
-		echo '<p>';
-		/* translators: %s: Selected employee name. */
-		printf( esc_html__( 'Connection settings, calendar choices and status below belong to %1$s.', 'hsp-calendar-connection' ), esc_html( $employee_name ) );
-		echo '</p>';
+		settings_errors( self::GROUP );
+		if ( isset( $messages[ $status ] ) ) {
+			echo '<div class="notice notice-info"><p>' . esc_html( $messages[ $status ] ) . '</p></div>';
+		}
 		if ( ! $employees ) {
 			echo '<div class="notice notice-warning"><p>' . esc_html__( 'Create an employee in Amelia before setting up a calendar connection.', 'hsp-calendar-connection' ) . '</p></div></div>';
 			return;
+		}
+		echo '<nav class="nav-tab-wrapper hspcc-settings-tabs" aria-label="' . esc_attr__( 'Settings', 'hsp-calendar-connection' ) . '">';
+		foreach ( $tabs as $key => $label ) {
+			$is_current = $tab === $key;
+			echo '<a class="nav-tab' . ( $is_current ? ' nav-tab-active' : '' ) . '" href="' . esc_url( self::settings_url( $key ) ) . '"' . ( $is_current ? ' aria-current="page"' : '' ) . '>' . esc_html( $label ) . '</a>';
+		}
+		echo '</nav><section class="hspcc-settings-panel" aria-labelledby="hspcc-section-' . esc_attr( $tab ) . '"><h2 id="hspcc-section-' . esc_attr( $tab ) . '">' . esc_html( $tabs[ $tab ] ) . '</h2>';
+		switch ( $tab ) {
+			case 'calendars':
+				self::render_calendars( $discovery, $connection );
+				break;
+			case 'runtime':
+				self::render_runtime( $connection, ! empty( $discovery['calendars'] ) );
+				break;
+			case 'status':
+				self::render_status( $connection );
+				break;
+			default:
+				self::render_connection( $employee_name, self::credentials() );
+		}
+		echo '</section></div>';
+	}
+
+	/**
+	 * Render the native credential form and guarded calendar discovery action.
+	 *
+	 * @param string $employee_name Selected employee label.
+	 * @param array  $credentials Current encrypted connection settings.
+	 * @return void No return value.
+	 */
+	private static function render_connection( $employee_name, array $credentials ) {
+		echo '<form method="post" action="' . esc_url( admin_url( 'options.php' ) ) . '">';
+		settings_fields( self::GROUP );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed hidden fields with an integer employee ID and an escaped allowlisted section.
+		echo self::employee_input();
+		echo '<table class="form-table"><tr><th><label for="hspcc-endpoint">' . esc_html__( 'CalDAV server URL', 'hsp-calendar-connection' ) . '</label></th><td><input type="url" class="regular-text" id="hspcc-endpoint" name="' . esc_attr( self::option_name( self::OPTION ) ) . '[endpoint]" value="' . esc_attr( self::endpoint() ) . '" placeholder="https://calendar.example.com/caldav/" required><p class="description">' . esc_html__( 'Use the direct HTTPS CalDAV endpoint. Discovery stays on this server and port; redirects and private network addresses are blocked. Use a DNS hostname rather than an IPv6 literal.', 'hsp-calendar-connection' ) . '</p></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Employee', 'hsp-calendar-connection' ) . '</th><td>' . esc_html( $employee_name . ' (#' . self::employee_id() . ')' ) . '<input type="hidden" name="' . esc_attr( self::option_name( self::OPTION ) ) . '[providerId]" value="' . (int) self::employee_id() . '"></td></tr>';
+		echo '<tr><th><label for="hspcc-username">' . esc_html__( 'CalDAV username', 'hsp-calendar-connection' ) . '</label></th><td><input class="regular-text" id="hspcc-username" name="' . esc_attr( self::option_name( self::OPTION ) ) . '[username]" value="' . esc_attr( $credentials['username'] ?? '' ) . '" autocomplete="username" maxlength="255" required></td></tr>';
+		echo '<tr><th><label for="hspcc-password">' . esc_html__( 'CalDAV password', 'hsp-calendar-connection' ) . '</label></th><td><input class="regular-text" type="password" id="hspcc-password" name="' . esc_attr( self::option_name( self::OPTION ) ) . '[password]" value="" autocomplete="new-password" maxlength="4096"><p class="description">';
+		echo empty( $credentials['secret'] ) ? esc_html__( 'No password is stored.', 'hsp-calendar-connection' ) : esc_html__( 'A password is stored securely. Leave this field blank to keep it.', 'hsp-calendar-connection' );
+		echo '</p></td></tr></table>';
+		echo '<p>' . esc_html__( 'Changing this employee’s server or account resets their calendar choices and disables their runtime sync. Their managed bookings and unresolved jobs must be reconciled first. A different server requires password entry.', 'hsp-calendar-connection' ) . '</p>';
+		submit_button( __( 'Save connection', 'hsp-calendar-connection' ), 'primary', 'hspcc-save-credentials' );
+		echo '</form><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="hspcc_discover">';
+		wp_nonce_field( 'hspcc_discover' );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed hidden fields with an integer employee ID and an escaped allowlisted section.
+		echo self::employee_input();
+		submit_button( __( 'Discover calendars', 'hsp-calendar-connection' ), 'secondary', 'hspcc-discover-calendars' );
+		echo '</form>';
+	}
+
+	/**
+	 * Render calendar routing, write verification and queued appointment status.
+	 *
+	 * @param array $discovery Fingerprint-bound calendar discovery result.
+	 * @param array $connection Sanitized current connection status.
+	 * @return void No return value.
+	 */
+	private static function render_calendars( array $discovery, array $connection ) {
+		if ( empty( $discovery['calendars'] ) ) {
+			echo '<p>' . esc_html__( 'Save a connection and discover calendars first.', 'hsp-calendar-connection' ) . '</p>';
+			return;
+		}
+
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="hspcc_select">';
+		wp_nonce_field( 'hspcc_select' );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed hidden fields with an integer employee ID and an escaped allowlisted section.
+		echo self::employee_input();
+		$busy_keys = self::source_keys();
+		echo '<fieldset><legend><strong>' . esc_html__( 'Read busy times from', 'hsp-calendar-connection' ) . '</strong></legend><p>' . esc_html__( 'Choose one or more calendars, up to ten.', 'hsp-calendar-connection' ) . '</p>';
+		foreach ( $discovery['calendars'] as $key => $calendar ) {
+			echo '<label><input type="checkbox" name="busy_calendars[]" value="' . esc_attr( $key ) . '"' .
+				checked( in_array( $key, $busy_keys, true ), true, false ) . ( empty( $calendar['freeBusy'] ) ? ' disabled' : '' ) . '> ' .
+				esc_html( $calendar['name'] ? $calendar['name'] : __( 'Unnamed calendar', 'hsp-calendar-connection' ) ) . ( empty( $calendar['freeBusy'] ) ? ' ' . esc_html__( '(free/busy access unavailable)', 'hsp-calendar-connection' ) : '' ) . '</label><br>';
+		}
+		echo '</fieldset><p><label for="hspcc-write-calendar"><strong>' . esc_html__( 'Store Amelia bookings in', 'hsp-calendar-connection' ) . '</strong></label></p>';
+		echo '<select id="hspcc-write-calendar" name="write_calendar"><option value="">' . esc_html__( 'Choose a destination later', 'hsp-calendar-connection' ) . '</option>';
+		foreach ( $discovery['calendars'] as $key => $calendar ) {
+			$read_only = ! empty( $calendar['privilegesChecked'] ) && empty( $calendar['canWrite'] );
+			echo '<option value="' . esc_attr( $key ) . '"' . selected( $discovery['writeSelected'] ?? '', $key, false ) . ( $read_only ? ' disabled' : '' ) . '>' .
+				esc_html( $calendar['name'] ? $calendar['name'] : __( 'Unnamed calendar', 'hsp-calendar-connection' ) ) . ( $read_only ? ' ' . esc_html__( '(read only)', 'hsp-calendar-connection' ) : '' ) . '</option>';
+		}
+		echo '</select><p class="description">' . esc_html__( 'Use the same CalDAV login for both. Appointment changes and cancellations are managed in Amelia.', 'hsp-calendar-connection' ) . '</p>';
+		echo '<p><label for="hspcc-timezone"><strong>' . esc_html__( 'Default calendar timezone', 'hsp-calendar-connection' ) . '</strong></label></p><input id="hspcc-timezone" class="regular-text" name="fallback_timezone" value="' . esc_attr( self::fallback_timezone() ) . '"><p class="description">' . esc_html__( 'Used for floating and all-day entries when the server does not publish a calendar timezone. A new connection starts with the WordPress site timezone.', 'hsp-calendar-connection' ) . '</p>';
+		submit_button( __( 'Save calendar choices', 'hsp-calendar-connection' ), 'secondary', 'hspcc-save-calendar' );
+		echo '</form>';
+		echo '<p>' . ( $connection['writingEnabled'] ? esc_html__( 'Appointment storage is enabled.', 'hsp-calendar-connection' ) : esc_html__( 'Appointment storage is not enabled yet.', 'hsp-calendar-connection' ) ) . '</p>';
+		if ( self::write_verified() ) {
+			echo '<p>' . esc_html__( 'The selected destination passed create, update and cleanup checks.', 'hsp-calendar-connection' ) . '</p>';
+		}
+		if ( self::private_option( self::PROBE, false ) ) {
+			echo '<p><strong>' . esc_html__( 'A temporary connection test still requires cleanup.', 'hsp-calendar-connection' ) . '</strong></p>'; }
+		if ( $connection['writeTargetSelected'] ) {
+			$pending = (bool) self::private_option( self::PROBE, false );
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="' . ( $pending ? 'hspcc_cleanup' : 'hspcc_probe' ) . '">';
+			wp_nonce_field( $pending ? 'hspcc_cleanup' : 'hspcc_probe' );
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed hidden fields with an integer employee ID and an escaped allowlisted section.
+			echo self::employee_input();
+			echo '<p class="description">' . esc_html__( 'The write test creates and updates a temporary event containing no customer details. Remove it to finish verification.', 'hsp-calendar-connection' ) . '</p>';
+			submit_button( $pending ? esc_html__( 'Remove test event', 'hsp-calendar-connection' ) : esc_html__( 'Test write access', 'hsp-calendar-connection' ), 'secondary', 'hspcc-test-writing' );
+			echo '</form>';
+		}
+		if ( $connection['writingEnabled'] ) {
+			$queue = HSPCC_Sync_Queue::summary( self::employee_id() );
+			echo '<p>';
+			/* translators: 1: Pending job count, 2: Retrying job count, 3: Conflict count. */
+			printf( esc_html__( 'Appointment sync: %1$d pending, %2$d retrying, %3$d conflicts.', 'hsp-calendar-connection' ), (int) ( $queue['pending'] ?? 0 ), (int) ( $queue['retrying'] ?? 0 ), (int) ( $queue['conflicts'] ?? 0 ) );
+			echo '</p>';
+			if ( ! empty( $queue['workerError'] ) || ! empty( $queue['errors'] ) ) {
+				echo '<p>' . esc_html__( 'Some appointment entries need attention. Saved jobs are retained for recovery.', 'hsp-calendar-connection' ) . '</p>'; }
+		}
+	}
+
+	/**
+	 * Render feature toggles, retaining the ability to disable an unavailable connection.
+	 *
+	 * @param array $connection Sanitized current connection status.
+	 * @param bool  $has_calendars Whether calendar discovery has usable collections.
+	 * @return void No return value.
+	 */
+	private static function render_runtime( array $connection, $has_calendars ) {
+		if ( ! $has_calendars ) {
+			echo '<p>' . esc_html__( 'Save a connection and discover calendars first.', 'hsp-calendar-connection' ) . '</p>';
+		}
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="hspcc_runtime">';
+		wp_nonce_field( 'hspcc_runtime' );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed hidden fields with an integer employee ID and an escaped allowlisted section.
+		echo self::employee_input();
+		echo '<p><label><input type="checkbox" name="enable_blocking" value="1"' . checked( $connection['enabled'], true, false ) . '> ' . esc_html__( 'Block busy times from the selected calendars', 'hsp-calendar-connection' ) . '</label></p>';
+			echo '<p><label><input type="checkbox" name="enable_writing" value="1"' . checked( $connection['writingEnabled'], true, false ) . '> ' . esc_html__( 'Store Amelia appointments in the selected destination', 'hsp-calendar-connection' ) . '</label></p>';
+		submit_button( __( 'Save runtime settings', 'hsp-calendar-connection' ), 'secondary', 'hspcc-save-runtime' );
+		echo '</form>';
+	}
+
+	/**
+	 * Render current availability health, supported booking scope and connection checking.
+	 *
+	 * @param array $connection Sanitized current connection status.
+	 * @return void No return value.
+	 */
+	private static function render_status( array $connection ) {
+		if ( ! $connection['configured'] ) {
+			echo '<p>' . esc_html__( 'Save a connection and discover calendars first.', 'hsp-calendar-connection' ) . '</p>';
 		}
 		echo '<p><strong>' . ( $connection['enabled'] ? esc_html__( 'Busy-time checks are enabled for this employee.', 'hsp-calendar-connection' ) : esc_html__( 'Busy-time checks are not enabled for this employee.', 'hsp-calendar-connection' ) ) . '</strong></p>';
 		echo '<p>' . esc_html__( 'The checked calendars block availability. A separate destination receives Amelia appointment entries when storage is enabled. Slot displays may use a validated result for up to 60 seconds; appointments receive a fresh availability check before saving.', 'hsp-calendar-connection' ) . '</p>';
@@ -1428,95 +1609,14 @@ final class HSP_Calendar_Connection {
 			printf( esc_html__( 'Last availability check: %1$s', 'hsp-calendar-connection' ), esc_html( wp_date( 'Y-m-d H:i:s T', $connection['checkedAt'] ) ) );
 			echo ' — ' . ( $connection['lastCheckOk'] ? esc_html__( 'Passed.', 'hsp-calendar-connection' ) : esc_html__( 'Failed; please check the connection.', 'hsp-calendar-connection' ) ) . '</p>';
 		}
-		settings_errors( self::GROUP );
-		if ( isset( $messages[ $status ] ) ) {
-			echo '<div class="notice notice-info"><p>' . esc_html( $messages[ $status ] ) . '</p></div>'; }
-		echo '<form method="post" action="' . esc_url( admin_url( 'options.php' ) ) . '">';
-		settings_fields( self::GROUP );
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed markup with an integer-only employee ID.
-		echo self::employee_input();
-		echo '<h2>' . esc_html__( 'Connection settings', 'hsp-calendar-connection' ) . '</h2><table class="form-table"><tr><th><label for="hspcc-endpoint">' . esc_html__( 'CalDAV server URL', 'hsp-calendar-connection' ) . '</label></th><td><input type="url" class="regular-text" id="hspcc-endpoint" name="' . esc_attr( self::option_name( self::OPTION ) ) . '[endpoint]" value="' . esc_attr( self::endpoint() ) . '" placeholder="https://calendar.example.com/caldav/" required><p class="description">' . esc_html__( 'Use the direct HTTPS CalDAV endpoint. Discovery stays on this server and port; redirects and private network addresses are blocked. Use a DNS hostname rather than an IPv6 literal.', 'hsp-calendar-connection' ) . '</p></td></tr>';
-		echo '<tr><th>' . esc_html__( 'Employee', 'hsp-calendar-connection' ) . '</th><td>' . esc_html( $employee_name . ' (#' . self::employee_id() . ')' ) . '<input type="hidden" name="' . esc_attr( self::option_name( self::OPTION ) ) . '[providerId]" value="' . (int) self::employee_id() . '"></td></tr>';
-		echo '<tr><th><label for="hspcc-username">' . esc_html__( 'CalDAV username', 'hsp-calendar-connection' ) . '</label></th><td><input class="regular-text" id="hspcc-username" name="' . esc_attr( self::option_name( self::OPTION ) ) . '[username]" value="' . esc_attr( $credentials['username'] ?? '' ) . '" autocomplete="username" maxlength="255" required></td></tr>';
-		echo '<tr><th><label for="hspcc-password">' . esc_html__( 'CalDAV password', 'hsp-calendar-connection' ) . '</label></th><td><input class="regular-text" type="password" id="hspcc-password" name="' . esc_attr( self::option_name( self::OPTION ) ) . '[password]" value="" autocomplete="new-password" maxlength="4096"><p class="description">';
-		echo empty( $credentials['secret'] ) ? esc_html__( 'No password is stored.', 'hsp-calendar-connection' ) : esc_html__( 'A password is stored securely. Leave this field blank to keep it.', 'hsp-calendar-connection' );
-		echo '</p></td></tr></table>';
-		echo '<p>' . esc_html__( 'Changing this employee’s server or account resets their calendar choices and disables their runtime sync. Their managed bookings and unresolved jobs must be reconciled first. A different server requires password entry.', 'hsp-calendar-connection' ) . '</p>';
-		submit_button( __( 'Save connection', 'hsp-calendar-connection' ), 'primary', 'hspcc-save-credentials' );
-		echo '</form><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="hspcc_discover">';
-		wp_nonce_field( 'hspcc_discover' );
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed markup with an integer-only employee ID.
-		echo self::employee_input();
-		submit_button( __( 'Discover calendars', 'hsp-calendar-connection' ), 'secondary', 'hspcc-discover-calendars' );
-		echo '</form>';
-		if ( ! empty( $discovery['calendars'] ) ) {
-			echo '<h2>' . esc_html__( 'Calendar routing', 'hsp-calendar-connection' ) . '</h2><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="hspcc_select">';
-			wp_nonce_field( 'hspcc_select' );
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed markup with an integer-only employee ID.
-			echo self::employee_input();
-			$busy_keys = self::source_keys();
-			echo '<fieldset><legend><strong>' . esc_html__( 'Read busy times from', 'hsp-calendar-connection' ) . '</strong></legend><p>' . esc_html__( 'Choose one or more calendars, up to ten.', 'hsp-calendar-connection' ) . '</p>';
-			foreach ( $discovery['calendars'] as $key => $calendar ) {
-				echo '<label><input type="checkbox" name="busy_calendars[]" value="' . esc_attr( $key ) . '"' .
-					checked( in_array( $key, $busy_keys, true ), true, false ) . ( empty( $calendar['freeBusy'] ) ? ' disabled' : '' ) . '> ' .
-					esc_html( $calendar['name'] ? $calendar['name'] : __( 'Unnamed calendar', 'hsp-calendar-connection' ) ) . ( empty( $calendar['freeBusy'] ) ? ' ' . esc_html__( '(free/busy access unavailable)', 'hsp-calendar-connection' ) : '' ) . '</label><br>';
-			}
-			echo '</fieldset><p><label for="hspcc-write-calendar"><strong>' . esc_html__( 'Store Amelia bookings in', 'hsp-calendar-connection' ) . '</strong></label></p>';
-			echo '<select id="hspcc-write-calendar" name="write_calendar"><option value="">' . esc_html__( 'Choose a destination later', 'hsp-calendar-connection' ) . '</option>';
-			foreach ( $discovery['calendars'] as $key => $calendar ) {
-				$read_only = ! empty( $calendar['privilegesChecked'] ) && empty( $calendar['canWrite'] );
-				echo '<option value="' . esc_attr( $key ) . '"' . selected( $discovery['writeSelected'] ?? '', $key, false ) . ( $read_only ? ' disabled' : '' ) . '>' .
-					esc_html( $calendar['name'] ? $calendar['name'] : __( 'Unnamed calendar', 'hsp-calendar-connection' ) ) . ( $read_only ? ' ' . esc_html__( '(read only)', 'hsp-calendar-connection' ) : '' ) . '</option>';
-			}
-			echo '</select><p class="description">' . esc_html__( 'Use the same CalDAV login for both. Appointment changes and cancellations are managed in Amelia.', 'hsp-calendar-connection' ) . '</p>';
-			echo '<p><label for="hspcc-timezone"><strong>' . esc_html__( 'Default calendar timezone', 'hsp-calendar-connection' ) . '</strong></label></p><input id="hspcc-timezone" class="regular-text" name="fallback_timezone" value="' . esc_attr( self::fallback_timezone() ) . '"><p class="description">' . esc_html__( 'Used for floating and all-day entries when the server does not publish a calendar timezone. A new connection starts with the WordPress site timezone.', 'hsp-calendar-connection' ) . '</p>';
-			submit_button( __( 'Save calendar choices', 'hsp-calendar-connection' ), 'secondary', 'hspcc-save-calendar' );
-			echo '</form>';
-			echo '<p>' . ( $connection['writingEnabled'] ? esc_html__( 'Appointment storage is enabled.', 'hsp-calendar-connection' ) : esc_html__( 'Appointment storage is not enabled yet.', 'hsp-calendar-connection' ) ) . '</p>';
-			if ( self::write_verified() ) {
-				echo '<p>' . esc_html__( 'The selected destination passed create, update and cleanup checks.', 'hsp-calendar-connection' ) . '</p>';
-			}
-			if ( self::private_option( self::PROBE, false ) ) {
-				echo '<p><strong>' . esc_html__( 'A temporary connection test still requires cleanup.', 'hsp-calendar-connection' ) . '</strong></p>'; }
-			if ( $connection['writeTargetSelected'] ) {
-				$pending = (bool) self::private_option( self::PROBE, false );
-				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="' . ( $pending ? 'hspcc_cleanup' : 'hspcc_probe' ) . '">';
-				wp_nonce_field( $pending ? 'hspcc_cleanup' : 'hspcc_probe' );
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed markup with an integer-only employee ID.
-				echo self::employee_input();
-				echo '<p class="description">' . esc_html__( 'The write test creates and updates a temporary event containing no customer details. Remove it to finish verification.', 'hsp-calendar-connection' ) . '</p>';
-				submit_button( $pending ? esc_html__( 'Remove test event', 'hsp-calendar-connection' ) : esc_html__( 'Test write access', 'hsp-calendar-connection' ), 'secondary', 'hspcc-test-writing' );
-				echo '</form>';
-			}
-			if ( $connection['writingEnabled'] ) {
-				$queue = HSPCC_Sync_Queue::summary( self::employee_id() );
-				echo '<p>';
-				/* translators: 1: Pending job count, 2: Retrying job count, 3: Conflict count. */
-				printf( esc_html__( 'Appointment sync: %1$d pending, %2$d retrying, %3$d conflicts.', 'hsp-calendar-connection' ), (int) ( $queue['pending'] ?? 0 ), (int) ( $queue['retrying'] ?? 0 ), (int) ( $queue['conflicts'] ?? 0 ) );
-				echo '</p>';
-				if ( ! empty( $queue['workerError'] ) || ! empty( $queue['errors'] ) ) {
-					echo '<p>' . esc_html__( 'Some appointment entries need attention. Saved jobs are retained for recovery.', 'hsp-calendar-connection' ) . '</p>'; }
-			}
-		}
-		{
-			echo '<h2>' . esc_html__( 'Runtime settings', 'hsp-calendar-connection' ) . '</h2><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="hspcc_runtime">';
-			wp_nonce_field( 'hspcc_runtime' );
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed markup with an integer-only employee ID.
-		echo self::employee_input();
-			echo '<p><label><input type="checkbox" name="enable_blocking" value="1"' . checked( $connection['enabled'], true, false ) . '> ' . esc_html__( 'Block busy times from the selected calendars', 'hsp-calendar-connection' ) . '</label></p>';
-			echo '<p><label><input type="checkbox" name="enable_writing" value="1"' . checked( $connection['writingEnabled'], true, false ) . '> ' . esc_html__( 'Store Amelia appointments in the selected destination', 'hsp-calendar-connection' ) . '</label></p>';
-			submit_button( __( 'Save runtime settings', 'hsp-calendar-connection' ), 'secondary', 'hspcc-save-runtime' );
-			echo '</form>';
-		}
 		if ( $connection['configured'] ) {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="hspcc_check">';
 			wp_nonce_field( 'hspcc_check' );
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed markup with an integer-only employee ID.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Fixed hidden fields with an integer employee ID and an escaped allowlisted section.
 			echo self::employee_input();
 			submit_button( __( 'Check connection', 'hsp-calendar-connection' ), 'secondary', 'hspcc-check-connection' );
 			echo '</form>';
 		}
-		echo '</div>';
 	}
 }
 require_once __DIR__ . '/includes/class-hspcc-free-busy.php';

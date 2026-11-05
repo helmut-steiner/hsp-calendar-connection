@@ -10,7 +10,7 @@ The runner limits each subprocess to 20 seconds and 128 KiB of output, with a 12
 
 The isolated GitHub updater fixture uses synthetic release responses and site transients. It checks native update/details integration, plugin identity, newer/current/older versions, runtime-only asset selection, preview and unsafe asset refusal, failure caching, unrelated plugin preservation and release-note sanitization. It performs no HTTP requests and does not force WordPress's automatic-installation preference.
 
-The current credential fixture checks s2/o2 encryption, independent key/AAD verification, random nonces, tamper and unsupported-format rejection, private options and employee isolation. It also runs with Sodium disabled to check OpenSSL. Employee UI checks exercise clean tab destinations, selected state, escaped names and form scope. Calendar identities are checked separately by the storage/queue fixtures.
+The current credential fixture checks s2/o2 encryption, independent key/AAD verification, random nonces, tamper and unsupported-format rejection, private options and employee isolation. It also runs with Sodium disabled to check OpenSSL. Employee UI checks exercise the dropdown plus selected-employee section tabs, clean destinations, selected state, escaped names, invalid navigation parameters and form scope. Calendar identities are checked separately by the storage/queue fixtures.
 
 ## Optional installed-Amelia suites
 

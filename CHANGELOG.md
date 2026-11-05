@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.6
+
+- Restore employee selection through the dropdown and use tabs for the chosen employee's Connection settings, Calendar routing, Runtime settings and Connection status.
+- Keep employee and section context through native settings saves and action redirects; successful discovery opens Calendar routing.
+- Keep navigation read-only, accessible without JavaScript, and usable with long labels, mobile and RTL layouts.
+- Use patched PHPCS/WordPressCS libraries, commit the development lockfile and enforce manifest validation and dependency audits in CI and releases.
+
 ## 0.5.5
 
 - Replace the employee selector with native WordPress navigation tabs that preserve independent connection settings and status.

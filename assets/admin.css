@@ -1,5 +1,24 @@
-/* Keep native WordPress tabs readable across long employee names and RTL locales. */
-.hspcc-employee-tabs {
+/* Retain native controls and readable section navigation across locales. */
+.hspcc-employee-controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.hspcc-employee-controls select {
+	box-sizing: border-box;
+	inline-size: min(100%, 32rem);
+	min-inline-size: 0;
+	max-inline-size: 100%;
+	min-block-size: 44px;
+}
+
+.hspcc-employee-controls .button {
+	min-block-size: 44px;
+}
+
+.hspcc-settings-tabs {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
@@ -7,11 +26,11 @@
 	margin-block-end: 12px;
 }
 
-.hspcc-employee-tabs::after {
+.hspcc-settings-tabs::after {
 	content: none;
 }
 
-.hspcc-employee-tabs .nav-tab {
+.hspcc-settings-tabs .nav-tab {
 	display: flex;
 	align-items: center;
 	float: none;
@@ -28,16 +47,31 @@
 	text-align: start;
 }
 
-.hspcc-employee-tabs .nav-tab bdi {
-	min-inline-size: 0;
-}
-
-.hspcc-employee-tabs .nav-tab-active {
+.hspcc-settings-tabs .nav-tab-active {
 	border-block-end: 3px solid currentColor;
 	padding-block-end: 7px;
 }
 
-.hspcc-employee-tabs .nav-tab:focus {
+.hspcc-settings-tabs .nav-tab:focus {
 	outline: 2px solid currentColor;
 	outline-offset: 2px;
+}
+
+.hspcc-employee-context,
+.hspcc-settings-panel {
+	overflow-wrap: anywhere;
+	hyphens: auto;
+}
+
+.hspcc-settings-panel .regular-text,
+.hspcc-settings-panel select {
+	box-sizing: border-box;
+	max-inline-size: 100%;
+}
+
+.hspcc-employee-controls .button,
+.hspcc-settings-panel .button {
+	max-inline-size: 100%;
+	height: auto;
+	white-space: normal;
 }

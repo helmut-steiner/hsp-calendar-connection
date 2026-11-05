@@ -13,11 +13,16 @@ function employee_ok($condition, $label) { employee_same(true, (bool) $condition
 function esc_attr($value) { return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); }
 function esc_html($value) { return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); }
 function esc_attr__($value, $domain = null) { return esc_attr($value); }
-function settings_errors(...$arguments) {}
-function settings_fields($group) { echo '<input type="hidden" name="option_page" value="' . esc_attr($group) . '">'; }
+function settings_errors(...$arguments) { echo '<div class="notice notice-error hspcc-synthetic-settings-notice"><p>Synthetic Settings API notice</p></div>'; }
+function settings_fields($group) {
+    echo '<input type="hidden" name="option_page" value="' . esc_attr($group) . '">';
+    echo '<input type="hidden" name="_wp_http_referer" value="' . esc_attr($_SERVER['REQUEST_URI'] ?? '') . '">';
+}
 function wp_nonce_field($action) { echo '<input type="hidden" name="_wpnonce" value="synthetic-nonce">'; }
 function submit_button($text, $type = 'primary', $name = 'submit', $wrap = true) {
-    echo '<button type="submit" name="' . esc_attr($name) . '">' . esc_html($text) . '</button>';
+    if ($wrap) { echo '<p class="submit">'; }
+    echo '<input type="submit" class="button button-' . esc_attr($type) . '" name="' . esc_attr($name) . '" value="' . esc_attr($text) . '">';
+    if ($wrap) { echo '</p>'; }
 }
 function selected($selected, $current = true, $display = true) {
     $result = (string) $selected === (string) $current ? ' selected="selected"' : '';
@@ -32,6 +37,7 @@ function checked($checked, $current = true, $display = true) {
 function wp_date($format, $timestamp = null) { return gmdate($format, $timestamp ?? time()); }
 function plugins_url($path, $plugin) { return 'https://local.test/wp-content/plugins/hsp-calendar-connection/' . $path; }
 function wp_enqueue_style(...$arguments) { $GLOBALS['hspcc_employee_styles'][] = $arguments; }
+function wp_enqueue_script(...$arguments) { $GLOBALS['hspcc_employee_scripts'][] = $arguments; }
 function employee_export_html(string $filename, string $html): void {
     $directory = getenv('HSPCC_TEST_HTML_DIRECTORY');
     if (!is_string($directory) || $directory === '') { return; }
@@ -43,6 +49,24 @@ function employee_fresh_request(): void {
     (new ReflectionProperty(HSP_Calendar_Connection::class, 'sanitized'))->setValue(null, null);
     $GLOBALS['hspcc_settings_error'] = null;
     $_GET = $_POST = [];
+}
+function employee_document(string $html): DOMXPath {
+    $document = new DOMDocument();
+    $previousErrors = libxml_use_internal_errors(true);
+    $document->loadHTML('<?xml encoding="UTF-8">' . $html);
+    libxml_clear_errors();
+    libxml_use_internal_errors($previousErrors);
+    return new DOMXPath($document);
+}
+function employee_render(int $employee, $tab = 'connection', array $query = [], array $post = []): string {
+    employee_fresh_request();
+    $_GET = array_replace(['page' => HSP_Calendar_Connection::PAGE, 'hspcc_employee' => (string) $employee, 'hspcc_tab' => $tab], $query);
+    $_POST = $post;
+    $_SERVER['REQUEST_URI'] = '/wp-admin/options-general.php?' . http_build_query($_GET);
+    HSP_Calendar_Connection::register();
+    ob_start();
+    HSP_Calendar_Connection::page();
+    return ob_get_clean();
 }
 function employee_snapshot(int $id): array {
     $snapshot = [];
@@ -208,65 +232,133 @@ HSP_Calendar_Connection::with_employee(8, static function () {
 });
 employee_same(1, HSP_Calendar_Connection::employee_id(), 'empty profile checks restore employee1');
 
-// Employee tabs render safe native links and retain the selected scope in every form.
-$employeeLabels = [1 => 'Ada <img src=x onerror=alert(1)> & Co', 7 => 'ليلى الموظفة ذات الاسم الطويل'];
+// The employee remains a native selector; only the selected settings subsection renders.
+$employeeLabels = [1 => 'Ada <img src=x onerror=alert(1)> & Co', 7 => 'ليلى الموظفة ذات الاسم الطويل', 8 => 'Unconfigured employee'];
 (new ReflectionProperty(HSPCC_Employee_Context::class, 'choices'))->setValue(null, $employeeLabels);
-$uiOneBefore = employee_snapshot(1);
-$uiSevenBefore = employee_snapshot(7);
-foreach ([1, 7] as $selectedEmployee) {
-    employee_fresh_request();
-    $_GET = ['page' => HSP_Calendar_Connection::PAGE, 'hspcc_employee' => (string) $selectedEmployee,
-        'hspcc_status' => 'selected', 'settings-updated' => 'true', 'unrelated' => 'discard'];
-    HSP_Calendar_Connection::register();
-    ob_start();
-    HSP_Calendar_Connection::page();
-    $page = ob_get_clean();
-    employee_export_html('employee-' . $selectedEmployee . '.html', $page);
-    $document = new DOMDocument();
-    $previousErrors = libxml_use_internal_errors(true);
-    $document->loadHTML('<?xml encoding="UTF-8">' . $page);
-    libxml_clear_errors();
-    libxml_use_internal_errors($previousErrors);
-    $xpath = new DOMXPath($document);
-    $navigation = $xpath->query('//nav[contains(concat(" ", normalize-space(@class), " "), " hspcc-employee-tabs ")]');
-    employee_same(1, $navigation->length, 'one employee navigation landmark is rendered');
-    employee_same('Amelia employee', $navigation->item(0)->getAttribute('aria-label'), 'employee navigation has a translated accessible label');
-    $tabs = $xpath->query('.//a', $navigation->item(0));
-    employee_same(2, $tabs->length, 'one native navigation link is rendered per employee');
-    employee_same(0, $xpath->query('.//*[@role="tab" or @role="tablist" or @tabindex]', $navigation->item(0))->length, 'native links keep ordinary keyboard behavior');
-    employee_same(1, $xpath->query('.//a[@aria-current="page"]', $navigation->item(0))->length, 'only the selected employee is marked current');
-    employee_same(0, $xpath->query('.//img | .//script', $navigation->item(0))->length, 'employee names cannot create markup in tabs');
-    foreach ($tabs as $tab) {
-        $parts = parse_url($tab->getAttribute('href'));
-        parse_str($parts['query'], $query);
-        $employee = (int) ($query['hspcc_employee'] ?? 0);
-        employee_same('http://local.test/wp-admin/options-general.php', $parts['scheme'] . '://' . $parts['host'] . $parts['path'], 'tabs navigate to the native settings page');
-        employee_same(['page' => HSP_Calendar_Connection::PAGE, 'hspcc_employee' => (string) $employee], $query, 'tab links include only page and employee, never stale notice parameters');
-        employee_same($employeeLabels[$employee] . ' (#' . $employee . ')', $tab->textContent, 'employee label and identifier survive contextual escaping');
-        employee_same($employee === $selectedEmployee ? 'page' : '', $tab->getAttribute('aria-current'), 'current link follows the selected employee');
-        employee_same($employee === $selectedEmployee, str_contains($tab->getAttribute('class'), 'nav-tab-active'), 'native active-tab appearance follows the selected employee');
-        employee_same(1, $xpath->query('./bdi', $tab)->length, 'mixed-direction employee names are isolated within the link');
+employee_seed(1, 'https://one.example.test/caldav/', 'synthetic-ui-password-one', true, false);
+employee_seed(7, 'https://seven.example.test:5006/caldav/', 'synthetic-ui-password-seven', false, true);
+$sectionLabels = ['connection' => 'Connection settings', 'calendars' => 'Calendar routing',
+    'runtime' => 'Runtime settings', 'status' => 'Connection status'];
+$uiBefore = $GLOBALS['hspcc_options'];
+$uiHttpBefore = count($GLOBALS['hspcc_requests']);
+foreach ([1, 7, 8] as $selectedEmployee) {
+    foreach ($sectionLabels as $selectedTab => $sectionLabel) {
+        $page = employee_render($selectedEmployee, $selectedTab,
+            ['hspcc_status' => 'selected', 'settings-updated' => 'true', 'unrelated' => 'discard']);
+        employee_export_html('employee-' . $selectedEmployee . '-' . $selectedTab . '.html', $page);
+        if ($selectedTab === 'connection') { employee_export_html('employee-' . $selectedEmployee . '.html', $page); }
+        $xpath = employee_document($page);
+        $selector = $xpath->query('//select[@name="hspcc_employee"]');
+        employee_same(1, $selector->length, 'one native employee selector remains available in every subsection');
+        employee_same('hspcc-employee', $selector->item(0)->getAttribute('id'), 'employee selector has its associated native label');
+        employee_same('Amelia employee', $xpath->query('//label[@for="hspcc-employee"]')->item(0)->textContent, 'employee selector has a translated visible label');
+        $selectorForm = $xpath->query('ancestor::form', $selector->item(0))->item(0);
+        employee_same('get', strtolower($selectorForm->getAttribute('method')), 'employee navigation uses a read-only GET form');
+        employee_same('http://local.test/wp-admin/options-general.php', $selectorForm->getAttribute('action'), 'employee selector has a clean native destination');
+        employee_same(1, $xpath->query('.//button[@name="hspcc-show-employee"] | .//input[@type="submit" and @name="hspcc-show-employee"]', $selectorForm)->length, 'employee selector works with its explicit submit control without JavaScript');
+        employee_same($selectedTab, $xpath->query('.//input[@name="hspcc_tab"]', $selectorForm)->item(0)->getAttribute('value'), 'switching employees preserves the current settings subsection');
+        employee_same(HSP_Calendar_Connection::PAGE, $xpath->query('.//input[@name="page"]', $selectorForm)->item(0)->getAttribute('value'), 'employee switch retains the native settings page');
+        employee_same(0, $xpath->query('.//input[@name="hspcc_status" or @name="settings-updated" or @name="unrelated"]', $selectorForm)->length, 'employee switch discards stale notices and unrelated parameters');
+        employee_same(0, $xpath->query('.//img | .//script', $selectorForm)->length, 'employee names cannot create markup in dropdown');
+        $options = $xpath->query('./option', $selector->item(0));
+        employee_same(3, $options->length, 'native employees including an unconfigured employee are selectable');
+        employee_same(1, $xpath->query('./option[@selected]', $selector->item(0))->length, 'only the displayed employee is selected');
+        foreach ($options as $option) {
+            $employee = (int) $option->getAttribute('value');
+            employee_same($employeeLabels[$employee] . ' (#' . $employee . ')', $option->textContent, 'employee names and IDs survive contextual escaping');
+            employee_same($employee === $selectedEmployee, $option->hasAttribute('selected'), 'dropdown selection follows the current employee');
+        }
+        $navigation = $xpath->query('//nav[contains(concat(" ", normalize-space(@class), " "), " hspcc-settings-tabs ")]');
+        employee_same(1, $navigation->length, 'one settings subsection navigation landmark is rendered');
+        $tabs = $xpath->query('.//a', $navigation->item(0));
+        employee_same(4, $tabs->length, 'four settings subsections have native navigation links');
+        employee_same(0, $xpath->query('.//*[@role="tab" or @role="tablist" or @tabindex]', $navigation->item(0))->length, 'server navigation keeps ordinary link keyboard behavior');
+        employee_same(1, $xpath->query('.//a[@aria-current="page"]', $navigation->item(0))->length, 'only the current subsection is marked current');
+        foreach ($tabs as $tab) {
+            $parts = parse_url($tab->getAttribute('href'));
+            parse_str($parts['query'], $query);
+            $section = $query['hspcc_tab'] ?? '';
+            employee_ok(isset($sectionLabels[$section]), 'section URL uses a known tab identifier');
+            employee_same('http://local.test/wp-admin/options-general.php', $parts['scheme'] . '://' . $parts['host'] . $parts['path'], 'tabs navigate to the native settings page');
+            employee_same(['page' => HSP_Calendar_Connection::PAGE, 'hspcc_employee' => (string) $selectedEmployee, 'hspcc_tab' => $section], $query, 'tab URLs retain only page, employee and subsection');
+            employee_same($sectionLabels[$section], $tab->textContent, 'tab label names the settings subsection');
+            employee_same($section === $selectedTab ? 'page' : '', $tab->getAttribute('aria-current'), 'current link follows the requested subsection');
+            employee_same($section === $selectedTab, str_contains($tab->getAttribute('class'), 'nav-tab-active'), 'native active-tab appearance follows current subsection');
+        }
+        employee_same(1, $xpath->query('//h2')->length, 'only the active subsection heading is rendered');
+        employee_same($sectionLabel, $xpath->query('//h2')->item(0)->textContent, 'active subsection heading matches navigation');
+        employee_same(1, $xpath->query('//div[contains(@class, "hspcc-synthetic-settings-notice")]')->length, 'native Settings API notices remain visible on every subsection');
+        employee_ok(str_contains($page, 'Calendar choices saved. Run Check connection to verify availability access.'), 'custom action notices remain visible on every subsection');
+        foreach ($xpath->query('//form[translate(@method, "POST", "post")="post"]') as $form) {
+            foreach (['hspcc_employee' => (string) $selectedEmployee, 'hspcc_tab' => $selectedTab] as $field => $value) {
+                $scope = $xpath->query('.//input[@type="hidden" and @name="' . $field . '"]', $form);
+                employee_same(1, $scope->length, 'each settings action includes one scope and subsection field');
+                employee_same($value, $scope->item(0)->getAttribute('value'), 'each settings action preserves the displayed scope and subsection');
+            }
+        }
+        $provider = $xpath->query('//input[contains(@name, "[providerId]")]');
+        employee_same($selectedTab === 'connection' ? 1 : 0, $provider->length, 'credentials form is rendered only in Connection settings');
+        employee_same($selectedTab === 'connection' ? 1 : 0, $xpath->query('//input[@type="password"]')->length, 'other subsections contain no hidden credentials form');
+        employee_same($selectedTab === 'runtime' ? 1 : 0, $xpath->query('//input[@name="enable_blocking"]')->length, 'runtime switches appear only in Runtime settings');
+        employee_same($selectedTab === 'calendars' && $selectedEmployee !== 8 ? 1 : 0,
+            $xpath->query('//select[@name="write_calendar"]')->length, 'calendar routing appears only for the selected employee with discovery data');
+        if ($selectedTab === 'connection') {
+            employee_same(HSP_Calendar_Connection::option_name(HSP_Calendar_Connection::OPTION, $selectedEmployee) . '[providerId]', $provider->item(0)->getAttribute('name'), 'connection field uses the selected employee option name');
+            employee_same((string) $selectedEmployee, $provider->item(0)->getAttribute('value'), 'connection form retains the selected provider');
+            $nativeForm = $xpath->query('//form[@action="http://local.test/wp-admin/options.php"]')->item(0);
+            $referer = $xpath->query('.//input[@name="_wp_http_referer"]', $nativeForm);
+            employee_same(1, $referer->length, 'connection form retains native Settings API return handling');
+            parse_str(parse_url($referer->item(0)->getAttribute('value'), PHP_URL_QUERY), $refererQuery);
+            employee_same((string) $selectedEmployee, $refererQuery['hspcc_employee'], 'native Settings return retains selected employee');
+            employee_same('connection', $refererQuery['hspcc_tab'], 'native Settings return retains connection subsection');
+            $endpoint = $xpath->query('//input[@id="hspcc-endpoint"]')->item(0)->getAttribute('value');
+            employee_same($selectedEmployee === 8 ? '' : ($selectedEmployee === 1 ? 'https://one.example.test/caldav/' : 'https://seven.example.test:5006/caldav/'), $endpoint, 'displayed connection belongs only to selected employee');
+        }
+        if ($selectedTab === 'calendars') {
+            if ($selectedEmployee === 8) {
+                employee_ok(str_contains($page, 'Save a connection and discover calendars first.'), 'unconfigured routing gives a useful empty state');
+                employee_same(0, $xpath->query('//input[@name="busy_calendars[]"]')->length, 'empty employee does not borrow another employee calendars');
+            } else {
+                employee_ok(str_contains($page, 'Synthetic busy ' . $selectedEmployee), 'routing shows selected employee discovered calendar names');
+                employee_ok(!str_contains($page, 'Synthetic busy ' . ($selectedEmployee === 1 ? 7 : 1)), 'routing omits the other employee calendars');
+            }
+        }
+        employee_same($uiBefore, $GLOBALS['hspcc_options'], 'page navigation changes no saved settings, flags, proofs or employee registry');
+        employee_same($uiHttpBefore, count($GLOBALS['hspcc_requests']), 'page navigation performs no calendar HTTP request');
     }
-    employee_same(0, $xpath->query('//select[@name="hspcc_employee"] | //button[@name="hspcc-show-employee"]')->length, 'obsolete selector and submit control are absent');
-    $forms = $xpath->query('//form');
-    employee_ok($forms->length >= 3, 'selected employee settings render their native forms');
-    foreach ($forms as $form) {
-        $scope = $xpath->query('.//input[@type="hidden" and @name="hspcc_employee"]', $form);
-        employee_same(1, $scope->length, 'every settings action has one employee scope field');
-        employee_same((string) $selectedEmployee, $scope->item(0)->getAttribute('value'), 'every settings action remains scoped to the displayed employee');
-    }
-    $provider = $xpath->query('//input[contains(@name, "[providerId]")]');
-    employee_same(1, $provider->length, 'connection form renders one provider identity');
-    employee_same(HSP_Calendar_Connection::option_name(HSP_Calendar_Connection::OPTION, $selectedEmployee) . '[providerId]', $provider->item(0)->getAttribute('name'), 'connection field uses the selected employee option name');
-    employee_same((string) $selectedEmployee, $provider->item(0)->getAttribute('value'), 'connection field retains the selected provider');
 }
-employee_same($uiOneBefore, employee_snapshot(1), 'rendering and navigating tabs preserves employee1 private state');
-employee_same($uiSevenBefore, employee_snapshot(7), 'rendering and navigating tabs preserves employee7 private state');
-$GLOBALS['hspcc_employee_styles'] = [];
+// Treat malformed and poisoned read-only tab input as the safe default.
+foreach (['', 'unknown', '../status', '<script>status</script>', 'status&hspcc_employee=1', ['status'], 42] as $invalidTab) {
+    $xpath = employee_document(employee_render(7, $invalidTab));
+    employee_same('Connection settings', $xpath->query('//h2')->item(0)->textContent, 'invalid tab input falls back to Connection settings');
+    foreach ($xpath->query('//input[@name="hspcc_tab"]') as $field) {
+        employee_same('connection', $field->getAttribute('value'), 'malformed tab input is never carried into forms');
+    }
+}
+foreach (['runtime', ['status'], '../calendars'] as $postedTab) {
+    employee_render(7, 'status', [], ['hspcc_employee' => '7', 'hspcc_tab' => $postedTab]);
+    employee_same(is_string($postedTab) && $postedTab === 'runtime' ? 'runtime' : 'connection',
+        invoke_private('requested_tab'), 'POST tab has precedence and invalid POST cannot inherit an unrelated GET subsection');
+}
+HSPCC_Employee_Context::select(7);
+foreach (['connection', 'calendars', 'runtime', 'status', '../status'] as $tab) {
+    $url = invoke_private('settings_url', $tab, 'runtime_saved');
+    parse_str(parse_url($url, PHP_URL_QUERY), $query);
+    employee_same(['page' => HSP_Calendar_Connection::PAGE, 'hspcc_employee' => '7',
+        'hspcc_tab' => isset($sectionLabels[$tab]) ? $tab : 'connection', 'hspcc_status' => 'runtime_saved'], $query,
+        'custom action return URL preserves only validated employee, subsection and fixed notice');
+}
+parse_str(parse_url(invoke_private('settings_url', 'connection', 'discovered'), PHP_URL_QUERY), $discoveredQuery);
+employee_same('calendars', $discoveredQuery['hspcc_tab'], 'successful discovery opens Calendar routing');
+employee_same('7', $discoveredQuery['hspcc_employee'], 'successful discovery keeps its employee scope');
+employee_same($uiBefore, $GLOBALS['hspcc_options'], 'invalid navigation and return-URL construction change no private settings');
+$GLOBALS['hspcc_employee_styles'] = $GLOBALS['hspcc_employee_scripts'] = [];
 HSP_Calendar_Connection::admin_assets('plugins.php');
-employee_same([], $GLOBALS['hspcc_employee_styles'], 'employee styles are not loaded on other admin pages');
+employee_same([], $GLOBALS['hspcc_employee_styles'], 'settings styles are not loaded on other admin pages');
+employee_same([], $GLOBALS['hspcc_employee_scripts'], 'employee selector script is not loaded on other admin pages');
 HSP_Calendar_Connection::admin_assets('settings_page_' . HSP_Calendar_Connection::PAGE);
-employee_same([['hspcc-admin', 'https://local.test/wp-content/plugins/hsp-calendar-connection/assets/admin.css', [], HSPCC_VERSION]], $GLOBALS['hspcc_employee_styles'], 'settings page loads the versioned employee stylesheet');
+employee_same([['hspcc-admin', 'https://local.test/wp-content/plugins/hsp-calendar-connection/assets/admin.css', [], HSPCC_VERSION]], $GLOBALS['hspcc_employee_styles'], 'settings page loads its versioned stylesheet');
+employee_same([], $GLOBALS['hspcc_employee_scripts'], 'native employee navigation requires no autosubmit script');
 if (getenv('HSPCC_TEST_HTML_DIRECTORY')) {
     $longLabels = [
         1 => 'Alexandria Maximiliana von Kalenderverbindungsverwaltung',
@@ -277,13 +369,10 @@ if (getenv('HSPCC_TEST_HTML_DIRECTORY')) {
         11 => '山田カレンダー接続および予約担当スタッフ',
     ];
     (new ReflectionProperty(HSPCC_Employee_Context::class, 'choices'))->setValue(null, $longLabels);
-    foreach (['long-labels-ltr' => 1, 'long-labels-rtl' => 7] as $scenario => $employee) {
-        employee_fresh_request();
-        $_GET = ['page' => HSP_Calendar_Connection::PAGE, 'hspcc_employee' => (string) $employee];
-        HSP_Calendar_Connection::register();
-        ob_start();
-        HSP_Calendar_Connection::page();
-        employee_export_html($scenario . '.html', ob_get_clean());
+    foreach (['long-labels-ltr' => 1, 'long-labels-rtl' => 7, 'long-labels-unbroken' => 10] as $scenario => $employee) {
+        foreach (array_keys($sectionLabels) as $tab) {
+            employee_export_html($scenario . '-' . $tab . '.html', employee_render($employee, $tab));
+        }
     }
 }
 employee_same($employeeHttpCount, count($GLOBALS['hspcc_requests']), 'employee context/settings fixtures make no new HTTP calls');

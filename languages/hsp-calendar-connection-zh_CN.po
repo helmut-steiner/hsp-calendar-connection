@@ -1,65 +1,65 @@
 msgid ""
-msgstr "Project-Id-Version: HSP Calendar Connection 0.5.5\nReport-Msgid-Bugs-To: https://github.com/helmut-steiner/hsp-calendar-connection/issues\nPOT-Creation-Date: 2026-11-05 12:00+0100\nPO-Revision-Date: 2026-11-05 12:00+0100\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Domain: hsp-calendar-connection\n"
+msgstr "Project-Id-Version: HSP Calendar Connection 0.5.6\nReport-Msgid-Bugs-To: https://github.com/helmut-steiner/hsp-calendar-connection/issues\nPOT-Creation-Date: 2026-11-05 12:00+0100\nPO-Revision-Date: 2026-11-05 12:00+0100\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Domain: hsp-calendar-connection\n"
 
-#: hsp-calendar-connection.php:1462
+#: hsp-calendar-connection.php:1530
 msgid "(free/busy access unavailable)"
 msgstr "（无法获取空闲/忙碌信息）"
 
-#: hsp-calendar-connection.php:1469
+#: hsp-calendar-connection.php:1537
 msgid "(read only)"
 msgstr "（只读）"
 
-#: hsp-calendar-connection.php:1442
+#: hsp-calendar-connection.php:1496
 msgid "A password is stored securely. Leave this field blank to keep it."
 msgstr "密码已安全保存。如需保留，请将此字段留空。"
 
-#: hsp-calendar-connection.php:1480
+#: hsp-calendar-connection.php:1548
 msgid "A temporary connection test still requires cleanup."
 msgstr "临时连接测试仍需清理。"
 
-#: hsp-calendar-connection.php:1397
+#: hsp-calendar-connection.php:1438
 msgid "Amelia employee"
 msgstr "Amelia 员工"
 
-#: hsp-calendar-connection.php:1475
+#: hsp-calendar-connection.php:1543
 msgid "Appointment storage is enabled."
 msgstr "预约存储已启用。"
 
-#: hsp-calendar-connection.php:1475
+#: hsp-calendar-connection.php:1543
 msgid "Appointment storage is not enabled yet."
 msgstr "预约存储尚未启用。"
 
 #. translators: 1: Pending job count, 2: Retrying job count, 3: Conflict count.
-#: hsp-calendar-connection.php:1495
+#: hsp-calendar-connection.php:1563
 #, php-format
 msgid "Appointment sync: %1$d pending, %2$d retrying, %3$d conflicts."
 msgstr "预约同步：%1$d 项待处理，%2$d 项正在重试，%3$d 项存在冲突。"
 
-#: hsp-calendar-connection.php:1383
+#: hsp-calendar-connection.php:1423
 msgid "Availability could not be verified. Affected booking times will stay unavailable while the connection is failing."
 msgstr "无法验证可预约时间。连接故障期间，受影响的时段将保持不可预约。"
 
-#: hsp-calendar-connection.php:1506
+#: hsp-calendar-connection.php:1585
 msgid "Block busy times from the selected calendars"
 msgstr "根据所选日历的忙碌时段阻止预约"
 
-#: hsp-calendar-connection.php:1420
+#: hsp-calendar-connection.php:1601
 msgid "Busy-time checks are enabled for this employee."
 msgstr "已为此员工启用忙碌时段检查。"
 
-#: hsp-calendar-connection.php:1420
+#: hsp-calendar-connection.php:1601
 msgid "Busy-time checks are not enabled for this employee."
 msgstr "尚未为此员工启用忙碌时段检查。"
 
-#: hsp-calendar-connection.php:1441
+#: hsp-calendar-connection.php:1495
 msgid "CalDAV password"
 msgstr "CalDAV 密码"
 
-#: hsp-calendar-connection.php:1438
+#: hsp-calendar-connection.php:1492
 msgid "CalDAV server URL"
 msgstr "CalDAV 服务器 URL"
 
-#: hsp-calendar-connection.php:1440
+#: hsp-calendar-connection.php:1494
 msgid "CalDAV username"
 msgstr "CalDAV 用户名"
 
@@ -67,7 +67,7 @@ msgstr "CalDAV 用户名"
 msgid "Calendar appointment could not be synchronized."
 msgstr "无法同步日历预约。"
 
-#: hsp-calendar-connection.php:657 hsp-calendar-connection.php:662 hsp-calendar-connection.php:671 hsp-calendar-connection.php:695 hsp-calendar-connection.php:698 hsp-calendar-connection.php:702
+#: hsp-calendar-connection.php:696 hsp-calendar-connection.php:701 hsp-calendar-connection.php:710 hsp-calendar-connection.php:734 hsp-calendar-connection.php:737 hsp-calendar-connection.php:741
 msgid "Calendar availability could not be verified."
 msgstr "无法验证日历的可预约时间。"
 
@@ -83,112 +83,116 @@ msgstr "无法验证日历的可预约时间。请重试或发送咨询。"
 msgid "Calendar busy-time response could not be validated."
 msgstr "无法验证日历忙碌时段响应。"
 
-#: hsp-calendar-connection.php:1378
+#: hsp-calendar-connection.php:1418
 msgid "Calendar choices saved. Run Check connection to verify availability access."
 msgstr "已保存日历选择。请运行“检查连接”，验证能否获取可预约时间。"
 
-#: hsp-calendar-connection.php:1376
+#: hsp-calendar-connection.php:1416
 msgid "Calendar discovery completed. Choose a calendar below."
 msgstr "日历发现已完成。请在下方选择日历。"
 
-#: includes/class-hspcc-sync-queue.php:1100
+#: includes/class-hspcc-sync-queue.php:1104
 msgid "Calendar queue state could not be validated."
 msgstr "无法验证日历队列状态。"
 
-#: hsp-calendar-connection.php:1453
+#: hsp-calendar-connection.php:1404
 msgid "Calendar routing"
 msgstr "日历读写路由"
 
-#: hsp-calendar-connection.php:1444
+#: hsp-calendar-connection.php:1498
 msgid "Changing this employee’s server or account resets their calendar choices and disables their runtime sync. Their managed bookings and unresolved jobs must be reconciled first. A different server requires password entry."
 msgstr "更改此员工的服务器或账户会重置其日历选择，并禁用运行时同步。必须先核对并处理其受管预约和未解决的任务。使用其他服务器时需要输入密码。"
 
-#: hsp-calendar-connection.php:1516
+#: hsp-calendar-connection.php:1617
 msgid "Check connection"
 msgstr "检查连接"
 
-#: hsp-calendar-connection.php:1377
+#: hsp-calendar-connection.php:1417
 msgid "Choose a calendar from the current discovery results."
 msgstr "请从当前发现结果中选择日历。"
 
-#: hsp-calendar-connection.php:1465
+#: hsp-calendar-connection.php:1533
 msgid "Choose a destination later"
 msgstr "稍后选择目标日历"
 
-#: hsp-calendar-connection.php:1458
+#: hsp-calendar-connection.php:1526
 msgid "Choose one or more calendars, up to ten."
 msgstr "请选择一个或多个日历，最多十个。"
 
-#: hsp-calendar-connection.php:1438
+#: hsp-calendar-connection.php:1403
 msgid "Connection settings"
 msgstr "连接设置"
 
-#. translators: %s: Selected employee name.
-#: hsp-calendar-connection.php:1414
+#. translators: %1$s: Selected employee name.
+#: hsp-calendar-connection.php:1447
 #, php-format
 msgid "Connection settings, calendar choices and status below belong to %1$s."
 msgstr "下方的连接设置、日历选择和状态属于 %1$s。"
 
-#: hsp-calendar-connection.php:1417
+#: hsp-calendar-connection.php:1406
+msgid "Connection status"
+msgstr "连接状态"
+
+#: hsp-calendar-connection.php:1455
 msgid "Create an employee in Amelia before setting up a calendar connection."
 msgstr "设置日历连接前，请先在 Amelia 中创建员工。"
 
-#: hsp-calendar-connection.php:1472
+#: hsp-calendar-connection.php:1540
 msgid "Default calendar timezone"
 msgstr "默认日历时区"
 
-#: hsp-calendar-connection.php:1450
+#: hsp-calendar-connection.php:1504
 msgid "Discover calendars"
 msgstr "发现日历"
 
-#: hsp-calendar-connection.php:1375
+#: hsp-calendar-connection.php:1415
 msgid "Discovery completed, but no calendar collections were found."
 msgstr "发现过程已完成，但未找到日历集合。"
 
-#: hsp-calendar-connection.php:1439
+#: hsp-calendar-connection.php:1493
 msgid "Employee"
 msgstr "员工"
 
-#: hsp-calendar-connection.php:1365 includes/class-hspcc-employee-context.php:148
+#: hsp-calendar-connection.php:1399 includes/class-hspcc-employee-context.php:148
 #, php-format
 msgid "Employee %1$d"
 msgstr "员工 %1$d"
 
-#. translators: %d: Employee identifier.
-#: hsp-calendar-connection.php:1362
+#. translators: %1$d: Employee identifier.
+#: hsp-calendar-connection.php:1395
 #, php-format
 msgid "Employee %1$d (not available in Amelia)"
 msgstr "员工 %1$d（在 Amelia 中不可用）"
 
-#: hsp-calendar-connection.php:407
+#: hsp-calendar-connection.php:441
 msgid "Enter a valid CalDAV username. Credentials were not changed."
 msgstr "请输入有效的 CalDAV 用户名。凭据未更改。"
 
-#: hsp-calendar-connection.php:401
+#: hsp-calendar-connection.php:435
 msgid "Enter a valid HTTPS CalDAV server URL and Amelia employee ID. Connection settings were not changed."
 msgstr "请输入有效的 HTTPS CalDAV 服务器 URL 和 Amelia 员工 ID。连接设置未更改。"
 
-#: hsp-calendar-connection.php:1381
+#: hsp-calendar-connection.php:1421
 msgid "Enter a valid calendar timezone, such as Europe/Vienna."
 msgstr "请输入有效的日历时区，例如 Europe/Vienna。"
 
-#: hsp-calendar-connection.php:433
+#: hsp-calendar-connection.php:467
 msgid "Enter the CalDAV password for the initial connection."
 msgstr "请输入首次连接所需的 CalDAV 密码。"
 
-#: hsp-calendar-connection.php:417
+#: hsp-calendar-connection.php:451
 msgid "Enter the password for the new CalDAV server. A saved password is never forwarded automatically to a different server."
 msgstr "请输入新 CalDAV 服务器的密码。已保存的密码绝不会自动转发到其他服务器。"
 
-#: hsp-calendar-connection.php:1380
+#: hsp-calendar-connection.php:1420
 msgid "Existing managed appointments must be migrated before changing the booking destination."
 msgstr "更改预约目标日历前，必须迁移现有受管预约。"
 
-#: hsp-calendar-connection.php:1429
+#: hsp-calendar-connection.php:1610
 msgid "Failed; please check the connection."
 msgstr "失败；请检查连接。"
 
-#: hsp-calendar-connection.php:1084
+#: hsp-calendar-connection.php:1123
 msgid "Forbidden."
 msgstr "禁止访问。"
 
@@ -196,21 +200,21 @@ msgstr "禁止访问。"
 msgid "HSP calendar retry (five minutes)"
 msgstr "HSP 日历重试（每五分钟）"
 
-#: hsp-calendar-connection.php:1422
+#: hsp-calendar-connection.php:1603
 msgid "If the destination is also checked, this employee’s managed entries are excluded from their external busy periods; Amelia checks those appointments itself. Other employees’ entries remain busy."
 msgstr "如果目标日历也在检查范围内，此员工的受管条目会从外部忙碌时段中排除；这些预约由 Amelia 自行检查。其他员工的条目仍视为忙碌时段。"
 
 #. translators: %s: Date and time of the last availability check.
-#: hsp-calendar-connection.php:1428
+#: hsp-calendar-connection.php:1609
 #, php-format
 msgid "Last availability check: %1$s"
 msgstr "上次可预约时间检查：%1$s"
 
-#: hsp-calendar-connection.php:1442
+#: hsp-calendar-connection.php:1496
 msgid "No password is stored."
 msgstr "尚未保存密码。"
 
-#: hsp-calendar-connection.php:1429
+#: hsp-calendar-connection.php:1610
 msgid "Passed."
 msgstr "通过。"
 
@@ -230,83 +234,91 @@ msgstr "私密 CalDAV 忙碌时段检查及 Amelia 预约回写，每位员工�
 msgid "Private CalDAV busy-time checks and Amelia appointment writeback."
 msgstr "私密 CalDAV 忙碌时段检查及 Amelia 预约回写。"
 
-#: hsp-calendar-connection.php:1458
+#: hsp-calendar-connection.php:1526
 msgid "Read busy times from"
 msgstr "读取忙碌时段的来源"
 
-#: hsp-calendar-connection.php:1488
+#: hsp-calendar-connection.php:1556
 msgid "Remove test event"
 msgstr "删除测试事件"
 
-#: hsp-calendar-connection.php:421
+#: hsp-calendar-connection.php:455
 msgid "Remove the temporary test event before replacing the saved password."
 msgstr "更换已保存的密码前，请先删除临时测试事件。"
 
-#: hsp-calendar-connection.php:413
+#: hsp-calendar-connection.php:447
 msgid "Resolve managed appointments, pending sync jobs and temporary tests before changing the server, account or employee. Connection settings were not changed."
 msgstr "更改服务器、账户或员工前，请先处理受管预约、待处理的同步任务和临时测试。连接设置未更改。"
 
-#: hsp-calendar-connection.php:1502
+#: hsp-calendar-connection.php:1405
 msgid "Runtime settings"
 msgstr "运行设置"
 
-#: hsp-calendar-connection.php:1384
+#: hsp-calendar-connection.php:1424
 msgid "Runtime settings could not be saved."
 msgstr "无法保存运行设置。"
 
-#: hsp-calendar-connection.php:1385
+#: hsp-calendar-connection.php:1425
 msgid "Runtime settings saved."
 msgstr "运行设置已保存。"
 
-#: hsp-calendar-connection.php:1473
+#: hsp-calendar-connection.php:1517 hsp-calendar-connection.php:1579 hsp-calendar-connection.php:1599
+msgid "Save a connection and discover calendars first."
+msgstr "请先保存连接并搜索日历。"
+
+#: hsp-calendar-connection.php:1541
 msgid "Save calendar choices"
 msgstr "保存日历选择"
 
-#: hsp-calendar-connection.php:1445
+#: hsp-calendar-connection.php:1499
 msgid "Save connection"
 msgstr "保存连接"
 
-#: hsp-calendar-connection.php:1508
+#: hsp-calendar-connection.php:1587
 msgid "Save runtime settings"
 msgstr "保存运行设置"
 
-#: hsp-calendar-connection.php:1369
+#: hsp-calendar-connection.php:1409
 msgid "Saved credentials are unavailable. Enter or replace them, then try again."
 msgstr "已保存的凭据不可用。请输入或更换凭据，然后重试。"
 
-#: hsp-calendar-connection.php:428
+#: hsp-calendar-connection.php:462
 msgid "Secure credential storage is unavailable. Credentials were not changed."
 msgstr "安全凭据存储不可用。凭据未更改。"
 
-#: hsp-calendar-connection.php:155
+#: hsp-calendar-connection.php:157 hsp-calendar-connection.php:1458
 msgid "Settings"
 msgstr "设置"
 
-#: hsp-calendar-connection.php:1498
+#: hsp-calendar-connection.php:1444
+msgid "Show employee"
+msgstr "显示员工"
+
+#: hsp-calendar-connection.php:1566
 msgid "Some appointment entries need attention. Saved jobs are retained for recovery."
 msgstr "部分预约条目需要处理。已保存的任务将保留以便恢复。"
 
-#: hsp-calendar-connection.php:1507
+#: hsp-calendar-connection.php:1586
 msgid "Store Amelia appointments in the selected destination"
 msgstr "将 Amelia 预约存储到所选目标日历"
 
-#: hsp-calendar-connection.php:1464
+#: hsp-calendar-connection.php:1532
 msgid "Store Amelia bookings in"
 msgstr "Amelia 预约的存储目标"
 
-#: hsp-calendar-connection.php:1424
+#: hsp-calendar-connection.php:1605
 msgid "Supported on Amelia 9.9.1: individual fixed-duration free appointments and capacity-one fixed-price appointments with on-site payment. Customer rescheduling requires the same service, employee and location. Online payments, packages, recurring appointments and other reassignment flows are not supported."
 msgstr "Amelia 9.9.1 支持：固定时长的免费个人预约，以及容量为一人、固定价格且现场付款的预约。客户改期时必须保持相同的服务、员工和地点。不支持在线付款、套餐、重复预约及其他重新分配流程。"
 
-#: hsp-calendar-connection.php:1390
+#: hsp-calendar-connection.php:1430
 msgid "Temporary event cleanup completed. Successful create/update verification now permits appointment storage."
 msgstr "临时事件清理已完成。创建和更新验证成功，现在可以启用预约存储。"
 
-#: hsp-calendar-connection.php:1488
+#: hsp-calendar-connection.php:1556
 msgid "Test write access"
 msgstr "测试写入权限"
 
-#: hsp-calendar-connection.php:1386
+#: hsp-calendar-connection.php:1426
 msgid "Test write access and remove the temporary event before enabling appointment storage."
 msgstr "启用预约存储前，请测试写入权限并删除临时事件。"
 
@@ -318,7 +330,7 @@ msgstr "该时段已不可预约。请选择其他时段。"
 msgid "The appointment could not be prepared for calendar synchronization."
 msgstr "无法准备预约以进行日历同步。"
 
-#: hsp-calendar-connection.php:1370
+#: hsp-calendar-connection.php:1410
 msgid "The calendar server could not be reached or returned an unsupported response."
 msgstr "无法连接日历服务器，或服务器返回了不受支持的响应。"
 
@@ -326,70 +338,70 @@ msgstr "无法连接日历服务器，或服务器返回了不受支持的响应
 msgid "The calendar server request could not be completed safely."
 msgstr "无法安全完成日历服务器请求。"
 
-#: hsp-calendar-connection.php:1421
+#: hsp-calendar-connection.php:1602
 msgid "The checked calendars block availability. A separate destination receives Amelia appointment entries when storage is enabled. Slot displays may use a validated result for up to 60 seconds; appointments receive a fresh availability check before saving."
 msgstr "检查范围内日历的忙碌时段将阻止预约。启用存储后，Amelia 预约条目会写入独立的目标日历。时段显示可使用最长 60 秒前验证的结果；保存预约前会重新检查可预约时间。"
 
-#: hsp-calendar-connection.php:1382
+#: hsp-calendar-connection.php:1422
 msgid "The free/busy availability check passed."
 msgstr "空闲/忙碌状态检查已通过。"
 
-#: hsp-calendar-connection.php:1477
+#: hsp-calendar-connection.php:1545
 msgid "The selected destination passed create, update and cleanup checks."
 msgstr "所选目标日历已通过创建、更新和清理检查。"
 
-#: hsp-calendar-connection.php:1373
+#: hsp-calendar-connection.php:1413
 msgid "The server did not return a supported same-origin calendar address."
 msgstr "服务器未返回受支持的同源日历地址。"
 
-#: hsp-calendar-connection.php:1371
+#: hsp-calendar-connection.php:1411
 msgid "The server rejected authentication or access. Check the CalDAV credentials."
 msgstr "服务器拒绝了身份验证或访问。请检查 CalDAV 凭据。"
 
-#: hsp-calendar-connection.php:1372
+#: hsp-calendar-connection.php:1412
 msgid "The server requested a redirect. Redirects are disabled for this connection."
 msgstr "服务器要求重定向。此连接已禁用重定向。"
 
-#: hsp-calendar-connection.php:1374
+#: hsp-calendar-connection.php:1414
 msgid "The server returned unsupported discovery data."
 msgstr "服务器返回了不受支持的发现数据。"
 
-#: hsp-calendar-connection.php:1389
+#: hsp-calendar-connection.php:1429
 msgid "The temporary event could not be removed. Check the connection and retry cleanup."
 msgstr "无法删除临时事件。请检查连接并重试清理。"
 
-#: hsp-calendar-connection.php:1388
+#: hsp-calendar-connection.php:1428
 msgid "The temporary event was created and updated. Remove the test event to complete verification."
 msgstr "临时事件已创建并更新。请删除测试事件以完成验证。"
 
-#: hsp-calendar-connection.php:1387
+#: hsp-calendar-connection.php:1427
 msgid "The write test could not be completed. If a temporary test is pending, remove it before trying again."
 msgstr "无法完成写入测试。如果有待处理的临时测试，请先将其删除，然后重试。"
 
-#: hsp-calendar-connection.php:1487
+#: hsp-calendar-connection.php:1555
 msgid "The write test creates and updates a temporary event containing no customer details. Remove it to finish verification."
 msgstr "写入测试会创建并更新一个不包含客户信息的临时事件。请将其删除以完成验证。"
 
-#: hsp-calendar-connection.php:1379
+#: hsp-calendar-connection.php:1419
 msgid "This login does not have write access to the chosen booking calendar."
 msgstr "此登录账户没有所选预约日历的写入权限。"
 
-#: hsp-calendar-connection.php:1462 hsp-calendar-connection.php:1469
+#: hsp-calendar-connection.php:1530 hsp-calendar-connection.php:1537
 msgid "Unnamed calendar"
 msgstr "未命名日历"
 
-#: hsp-calendar-connection.php:1438
+#: hsp-calendar-connection.php:1492
 msgid "Use the direct HTTPS CalDAV endpoint. Discovery stays on this server and port; redirects and private network addresses are blocked. Use a DNS hostname rather than an IPv6 literal."
 msgstr "请使用直接的 HTTPS CalDAV 端点。发现过程仅限此服务器和端口；重定向和私有网络地址会被阻止。请使用 DNS 主机名，而非 IPv6 地址字面量。"
 
-#: hsp-calendar-connection.php:1471
+#: hsp-calendar-connection.php:1539
 msgid "Use the same CalDAV login for both. Appointment changes and cancellations are managed in Amelia."
 msgstr "两者请使用相同的 CalDAV 登录凭据。预约变更和取消在 Amelia 中管理。"
 
-#: hsp-calendar-connection.php:1472
+#: hsp-calendar-connection.php:1540
 msgid "Used for floating and all-day entries when the server does not publish a calendar timezone. A new connection starts with the WordPress site timezone."
 msgstr "当服务器未提供日历时区时，用于未指定时区的事件和全天事件。新连接默认使用 WordPress 网站时区。"
 
-#: hsp-calendar-connection.php:1423
+#: hsp-calendar-connection.php:1604
 msgid "Working hours and public booking availability are managed separately in Amelia."
 msgstr "工作时间和对外开放的可预约时间在 Amelia 中单独管理。"

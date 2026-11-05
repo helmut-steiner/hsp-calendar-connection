@@ -2,7 +2,7 @@
 Tags: caldav, calendar, appointments, amelia
 Requires at least: 5.8
 Requires PHP: 8.0
-Stable tag: 0.5.5
+Stable tag: 0.5.6
 License: HSP Personal Noncommercial Contribution License 1.0
 License URI: https://github.com/helmut-steiner/hsp-calendar-connection/blob/main/LICENSE
 
@@ -10,7 +10,7 @@ Private CalDAV busy-time checks and appointment writeback with one connection pe
 
 == Description ==
 
-Choose an employee tab by name, connect their HTTPS CalDAV account, select multiple busy calendars and optionally one write destination on that connection. Settings and status follow the selected employee. Native appointments and background workers route by their actual employee, independently of the administrator's selection.
+Choose an employee by name from the dropdown, connect their HTTPS CalDAV account, select multiple busy calendars and optionally one write destination on that connection. Settings and status follow the selected employee. Native appointments and background workers route by their actual employee, independently of the administrator's selection.
 
 Each employee has separate credentials, routing, health, feature controls and managed-event identifiers. Employees may share a destination without sharing event ownership. A write calendar may also be a busy source; that employee's owned entries are excluded while manual conflicts and other employees' entries remain busy.
 
@@ -26,13 +26,13 @@ Public GitHub Releases integrate with native WordPress update checks and plugin 
 
 == Installation ==
 
-Install version 0.5.5 manually. It requires current HSP option names, busySelected routing, version-2 queue records and s2:/o2: encrypted credentials, or a fresh installation. Old option/configuration/password imports have been removed. Installing 0.5.4 alone did not convert old encrypted passwords; finish conversion before replacing it. Retain a private options backup and the previous ZIP for recovery. Keep only one active copy.
+Install version 0.5.6 manually. It requires current HSP option names, busySelected routing, version-2 queue records and s2:/o2: encrypted credentials, or a fresh installation. Old option/configuration/password imports have been removed. Installing 0.5.4 alone did not convert old encrypted passwords; finish conversion before replacing it. Retain a private options backup and the previous ZIP for recovery. Keep only one active copy.
 
 1. Install and activate HSP Calendar Connection alongside Amelia 9.9.1.
 2. Open Settings > HSP Calendar Connection as an administrator.
-3. Open the named Amelia employee tab, then privately save their HTTPS CalDAV address and account credentials. Create employees in Amelia first.
-4. Discover calendars, select busy sources and optionally one write destination, and review the fallback timezone.
-5. Check reading. For writeback, click Test write access, then Remove test event. The temporary event has no customer data; cleanup completes the current connection-bound proof.
+3. Choose the named Amelia employee from the dropdown, then privately save their HTTPS CalDAV address and account credentials. Create employees in Amelia first.
+4. In Connection settings, save the connection and discover calendars. Then use Calendar routing to select busy sources, optionally one write destination, and the fallback timezone.
+5. Use Connection status to check reading. In Calendar routing, click Test write access, then Remove test event. The temporary event has no customer data; cleanup completes the current connection-bound proof.
 6. Choose the two checkboxes under Runtime settings and click Save runtime settings. New employee connections start disabled; disabling remains available even if setup is incomplete. Repeat setup for each employee who needs a connection.
 7. Configure Amelia's real hours/services/policies and test bookings, changes, cancellation and notifications before public use.
 
@@ -75,6 +75,11 @@ The Original Project is https://github.com/helmut-steiner/hsp-calendar-connectio
 For commercial permission or a private delivery method, open a non-sensitive contact request for Helmut Steiner at https://github.com/helmut-steiner/hsp-calendar-connection/issues. Do not disclose vulnerability details, credentials or private calendar/customer data there. Follow the included SECURITY.md and section 4 of LICENSE. When safe delivery is unavailable, retain a dated record and submission-ready copy, check documented contact locations at least every 30 days and deliver within 14 days after safe delivery becomes known or would be learned through those checks.
 
 == Changelog ==
+
+= 0.5.6 =
+* Restore the employee dropdown and organize the selected employee's Connection settings, Calendar routing, Runtime settings and Connection status into separate tabs.
+* Preserve employee and section context during navigation and form actions; open Calendar routing after successful discovery.
+* Include the patched, locked development tools and security audits required by GitHub CI.
 
 = 0.5.5 =
 * Use employee tabs for independent connection settings and status, with mobile/RTL wrapping and keyboard focus.
@@ -130,6 +135,9 @@ For commercial permission or a private delivery method, open a non-sensitive con
 * Private encrypted credential setup and calendar discovery.
 
 == Upgrade Notice ==
+
+= 0.5.6 =
+The employee dropdown is retained. Tabs now select sections of that employee's settings; Connection settings is the default.
 
 = 0.5.5 =
 Historical data imports and s1/o1 password readers have been removed. Existing installations must already use the current formats; retain a private settings backup before replacing the previous version.
