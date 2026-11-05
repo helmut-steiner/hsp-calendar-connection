@@ -1,0 +1,43 @@
+/* Keep native WordPress tabs readable across long employee names and RTL locales. */
+.hspcc-employee-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 12px 0 8px;
+	margin-block-end: 12px;
+}
+
+.hspcc-employee-tabs::after {
+	content: none;
+}
+
+.hspcc-employee-tabs .nav-tab {
+	display: flex;
+	align-items: center;
+	float: none;
+	box-sizing: border-box;
+	min-inline-size: 0;
+	max-inline-size: 100%;
+	min-block-size: 44px;
+	margin: 0;
+	padding: 9px 12px;
+	border-bottom: 1px solid #c3c4c7;
+	white-space: normal;
+	overflow-wrap: anywhere;
+	hyphens: auto;
+	text-align: start;
+}
+
+.hspcc-employee-tabs .nav-tab bdi {
+	min-inline-size: 0;
+}
+
+.hspcc-employee-tabs .nav-tab-active {
+	border-block-end: 3px solid currentColor;
+	padding-block-end: 7px;
+}
+
+.hspcc-employee-tabs .nav-tab:focus {
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}

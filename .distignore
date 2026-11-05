@@ -1,0 +1,17 @@
+/.git
+/.github
+/.gitignore
+/.gitattributes
+/.distignore
+/tests
+/tools
+/build
+/dist
+/vendor
+/composer.json
+/composer.lock
+/phpcs.xml.dist
+*.zip
+*.log
+/.env
+/.env.*

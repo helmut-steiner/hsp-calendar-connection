@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag, exactly v<plugin-version>
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, xml, xmlreader, xmlwriter, mbstring, openssl, sodium
+          coverage: none
+          tools: composer
+      - name: Install pinned development standards
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Check WordPress coding standards
+        run: composer standards
+      - name: Verify translations
+        run: |
+          php tools/extract-messages.php > /tmp/hspcc-messages.json
+          python3 tools/compile-catalogs.py --check --messages /tmp/hspcc-messages.json
+      - name: Run portable tests without Amelia
+        env:
+          HSPCC_AMELIA_PATH: ''
+        run: php tests/run.php
+      - name: Verify release tag and build runtime package
+        run: |
+          git show-ref --verify --quiet "refs/tags/${RELEASE_TAG}"
+          test "$(git rev-parse HEAD)" = "$(git rev-list -n 1 "refs/tags/${RELEASE_TAG}")"
+          python3 tools/build-release.py --tag "$RELEASE_TAG"
+      - name: Upload package and SHA-256 manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null
+          gh release upload "$RELEASE_TAG" dist/hsp-calendar-connection-*.zip dist/hsp-calendar-connection-*.manifest.json --repo "$GITHUB_REPOSITORY" --clobber

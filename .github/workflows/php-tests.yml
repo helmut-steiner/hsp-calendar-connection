@@ -1,0 +1,41 @@
+name: PHP tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.4']
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, xml, xmlreader, xmlwriter, mbstring, openssl, sodium
+          coverage: none
+          tools: composer
+      - name: Install pinned development standards
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Check WordPress coding standards
+        run: composer standards
+      - name: Verify translations
+        run: |
+          php tools/extract-messages.php > /tmp/hspcc-messages.json
+          python3 tools/compile-catalogs.py --check --messages /tmp/hspcc-messages.json
+      - name: Run portable tests without Amelia
+        env:
+          HSPCC_AMELIA_PATH: ''
+        run: php tests/run.php
+      - name: Verify runtime package
+        run: python3 tools/build-release.py

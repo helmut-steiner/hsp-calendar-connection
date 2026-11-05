@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<ruleset name="HSP Calendar Connection">
+    <description>WordPress standards for distributed plugin PHP; native contracts have documented local exceptions.</description>
+    <file>hsp-calendar-connection.php</file>
+    <file>includes</file>
+    <arg name="extensions" value="php"/>
+    <arg value="s"/>
+    <rule ref="WordPress"/>
+    <rule ref="WordPress.Files.FileName.InvalidClassFileName">
+        <!-- WordPress discovers the plugin header in this stable entry point. -->
+        <exclude-pattern>*/hsp-calendar-connection.php</exclude-pattern>
+    </rule>
+</ruleset>

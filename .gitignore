@@ -1,0 +1,26 @@
+# Local configuration and sensitive material must not enter a source release.
+/.env
+/.env.*
+!/.env.example
+/private/
+*.key
+*.pem
+*.log
+
+# This plugin consumes Amelia's installed dependencies; do not bundle them.
+/vendor/
+
+# Generated packages, local tooling and caches.
+/build/
+/dist/
+*.zip
+/.idea/
+/.vscode/
+/.phpunit.cache/
+/.phpunit.result.cache
+/.php-cs-fixer.cache
+__pycache__/
+*.pyc
+/.phpcs-cache
+.DS_Store
+Thumbs.db
