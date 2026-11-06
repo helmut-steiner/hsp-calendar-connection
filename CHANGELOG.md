@@ -4,6 +4,7 @@
 
 - Require WordPress 7.1.4 or later and PHP 8.4 or later. Report these requirements in the native WordPress updater and plugin details.
 - Run the portable test suite in CI on PHP 8.4 and 8.5.
+- Publish GitHub releases when version tags are pushed. Generate notes from the matching changelog section and attach the plugin ZIP and its SHA-256 manifest.
 
 ## 0.5.6
 

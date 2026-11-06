@@ -1,30 +1,40 @@
 name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags: ['v*']
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing release tag, exactly v<plugin-version>
+        description: Existing version tag, exactly v<plugin-version>
         required: true
         type: string
 
 permissions:
   contents: read
 
+concurrency:
+  group: release-${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       contents: write
     env:
-      RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      RELEASE_TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.release.tag_name || inputs.tag }}
+          ref: refs/tags/${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+      - name: Validate version and prepare release message
+        run: |
+          python3 -B tests/test-release-notes.py
+          python3 -B tools/release-notes.py --tag "$RELEASE_TAG" \
+            --plugin hsp-calendar-connection.php --constant HSPCC_VERSION \
+            --output "$RUNNER_TEMP/release-notes.md"
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -53,9 +63,27 @@ jobs:
           git show-ref --verify --quiet "refs/tags/${RELEASE_TAG}"
           test "$(git rev-parse HEAD)" = "$(git rev-list -n 1 "refs/tags/${RELEASE_TAG}")"
           python3 tools/build-release.py --tag "$RELEASE_TAG"
-      - name: Upload package and SHA-256 manifest
+      - name: Verify remote tag and publish release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null
-          gh release upload "$RELEASE_TAG" dist/hsp-calendar-connection-*.zip dist/hsp-calendar-connection-*.manifest.json --repo "$GITHUB_REPOSITORY" --clobber
+          tag_ref="refs/tags/${RELEASE_TAG}"
+          remote_refs="$(git ls-remote --exit-code origin "$tag_ref" "${tag_ref}^{}")"
+          remote_commit="$(awk -v ref="$tag_ref" '
+            $2 == ref { tag = $1 }
+            $2 == ref "^{}" { peeled = $1 }
+            END { print peeled ? peeled : tag }
+          ' <<< "$remote_refs")"
+          if [ "$remote_commit" != "$(git rev-parse HEAD)" ]; then
+            echo "::error::The release tag no longer points to the packaged commit."
+            exit 1
+          fi
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+              --title "$RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md"
+            gh release upload "$RELEASE_TAG" dist/hsp-calendar-connection-*.zip dist/hsp-calendar-connection-*.manifest.json \
+              --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$RELEASE_TAG" dist/hsp-calendar-connection-*.zip dist/hsp-calendar-connection-*.manifest.json \
+              --repo "$GITHUB_REPOSITORY" --verify-tag --title "$RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md"
+          fi
