@@ -1,8 +1,9 @@
 === HSP Calendar Connection ===
 Tags: caldav, calendar, appointments, amelia
-Requires at least: 5.8
-Requires PHP: 8.0
-Stable tag: 0.5.6
+Requires at least: 7.1.4
+Tested up to: 7.1.4
+Requires PHP: 8.4
+Stable tag: 0.5.7
 License: HSP Personal Noncommercial Contribution License 1.0
 License URI: https://github.com/helmut-steiner/hsp-calendar-connection/blob/main/LICENSE
 
@@ -16,7 +17,7 @@ Each employee has separate credentials, routing, health, feature controls and ma
 
 Amelia retains services, working hours, bookings and notifications. This is a separate integration plugin, not a native Amelia calendar connector. Amelia 9.9.1 and its prefixed Sabre VObject classes are required; neither Amelia nor vendor dependencies are bundled.
 
-PHP 8.0+, DOM/XML, mbstring and Sodium or OpenSSL AES-256-GCM are required. Use an HTTPS DNS hostname; IPv6 literal addresses are not supported.
+WordPress 7.1.4 or later and PHP 8.4 or later are required. Enable DOM/XML, mbstring and either Sodium or OpenSSL AES-256-GCM. Use an HTTPS DNS hostname; IPv6 literal addresses are not supported.
 
 The validated guard scope includes free fixed appointments/free selected extras and Amelia 9.9.1 fixed paid frontend appointments with one person, capacity one and native on-site payment. Native Amelia retains price/tax/payment calculations. Customer-panel time changes require the authenticated owner's own single approved/pending capacity-one booking, unchanged targets and no merge. Paid moves additionally require an unchanged fixed base price and one canonical on-site payment with no package/parent/WooCommerce/online association. Native authentication, canonical membership and fresh CalDAV checks are required. Paid extras, coupons, deposits, custom durations/pricing, online payments/callbacks, recurring/package/cart and other single-booking reassignment remain outside scope. Other paid backend creation/update/status paths are refused; cancellation remains possible during calendar failures. These paths fail closed on unreviewed Amelia versions. Each new employee connection starts disabled.
 
@@ -26,7 +27,7 @@ Public GitHub Releases integrate with native WordPress update checks and plugin 
 
 == Installation ==
 
-Install version 0.5.6 manually. It requires current HSP option names, busySelected routing, version-2 queue records and s2:/o2: encrypted credentials, or a fresh installation. Old option/configuration/password imports have been removed. Installing 0.5.4 alone did not convert old encrypted passwords; finish conversion before replacing it. Retain a private options backup and the previous ZIP for recovery. Keep only one active copy.
+Install version 0.5.7 manually. It requires current HSP option names, busySelected routing, version-2 queue records and s2:/o2: encrypted credentials, or a fresh installation. Old option/configuration/password imports have been removed. Installing 0.5.4 alone did not convert old encrypted passwords; finish conversion before replacing it. Retain a private options backup and the previous ZIP for recovery. Keep only one active copy.
 
 1. Install and activate HSP Calendar Connection alongside Amelia 9.9.1.
 2. Open Settings > HSP Calendar Connection as an administrator.
@@ -75,6 +76,10 @@ The Original Project is https://github.com/helmut-steiner/hsp-calendar-connectio
 For commercial permission or a private delivery method, open a non-sensitive contact request for Helmut Steiner at https://github.com/helmut-steiner/hsp-calendar-connection/issues. Do not disclose vulnerability details, credentials or private calendar/customer data there. Follow the included SECURITY.md and section 4 of LICENSE. When safe delivery is unavailable, retain a dated record and submission-ready copy, check documented contact locations at least every 30 days and deliver within 14 days after safe delivery becomes known or would be learned through those checks.
 
 == Changelog ==
+
+= 0.5.7 =
+* Require WordPress 7.1.4 or later and PHP 8.4 or later. Report these requirements in WordPress update and plugin details screens.
+* Run the portable suite in CI on PHP 8.4 and 8.5.
 
 = 0.5.6 =
 * Restore the employee dropdown and organize the selected employee's Connection settings, Calendar routing, Runtime settings and Connection status into separate tabs.
@@ -135,6 +140,9 @@ For commercial permission or a private delivery method, open a non-sensitive con
 * Private encrypted credential setup and calendar discovery.
 
 == Upgrade Notice ==
+
+= 0.5.7 =
+Update WordPress to 7.1.4 or later and PHP to 8.4 or later before installing this version.
 
 = 0.5.6 =
 The employee dropdown is retained. Tabs now select sections of that employee's settings; Connection settings is the default.

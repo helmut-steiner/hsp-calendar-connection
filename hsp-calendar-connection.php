@@ -3,9 +3,9 @@
  * Plugin Name: HSP Calendar Connection
  * Plugin URI: https://github.com/helmut-steiner/hsp-calendar-connection
  * Description: Private CalDAV busy-time checks and Amelia appointment writeback.
- * Version: 0.5.6
- * Requires at least: 5.8
- * Requires PHP: 8.0
+ * Version: 0.5.7
+ * Requires at least: 7.1.4
+ * Requires PHP: 8.4
  * Author: Helmut Steiner
  * License: HSP Personal Noncommercial Contribution License 1.0
  * License URI: https://github.com/helmut-steiner/hsp-calendar-connection/blob/main/LICENSE
@@ -18,7 +18,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'HSPCC_VERSION', '0.5.6' );
+define( 'HSPCC_VERSION', '0.5.7' );
 require_once __DIR__ . '/includes/class-hspcc-updater.php';
 HSPCC_Updater::init( __FILE__ );
 

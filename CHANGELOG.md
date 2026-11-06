@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.7
+
+- Require WordPress 7.1.4 or later and PHP 8.4 or later. Report these requirements in the native WordPress updater and plugin details.
+- Run the portable test suite in CI on PHP 8.4 and 8.5.
+
 ## 0.5.6
 
 - Restore employee selection through the dropdown and use tabs for the chosen employee's Connection settings, Calendar routing, Runtime settings and Connection status.

@@ -13,6 +13,10 @@ final class HSPCC_Updater {
 	const REPO              = 'hsp-calendar-connection';
 	const SLUG              = 'hsp-calendar-connection';
 	const RELEASE_TRANSIENT = 'hspcc_github_release';
+
+	private const REQUIRES_WP  = '7.1.4';
+	private const REQUIRES_PHP = '8.4';
+	private const TESTED_WP    = '7.1.4';
 	/**
 	 * Installed plugin basename.
 	 *
@@ -58,8 +62,9 @@ final class HSPCC_Updater {
 			'new_version'  => $installed,
 			'url'          => self::repo_url(),
 			'package'      => '',
-			'requires'     => '5.8',
-			'requires_php' => '8.0',
+			'requires'     => self::REQUIRES_WP,
+			'requires_php' => self::REQUIRES_PHP,
+			'tested'       => self::TESTED_WP,
 		);
 		if ( '' !== $version && version_compare( $version, $installed, '>' ) ) {
 			$update->new_version                       = $version;
@@ -98,8 +103,9 @@ final class HSPCC_Updater {
 			'author'         => 'Helmut Steiner',
 			'author_profile' => 'https://github.com/' . self::OWNER,
 			'homepage'       => self::repo_url(),
-			'requires'       => '5.8',
-			'requires_php'   => '8.0',
+			'requires'       => self::REQUIRES_WP,
+			'requires_php'   => self::REQUIRES_PHP,
+			'tested'         => self::TESTED_WP,
 			'download_link'  => self::package_url( $release ),
 			'sections'       => array(
 				'description' => esc_html__( 'Private CalDAV busy-time checks and Amelia appointment writeback, with one connection per employee.', 'hsp-calendar-connection' ),

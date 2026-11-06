@@ -4,7 +4,7 @@
 
 Read the licensing and submission requirements below before changing the software. Fork [helmut-steiner/hsp-calendar-connection](https://github.com/helmut-steiner/hsp-calendar-connection), create a feature branch and keep changes focused. Follow WordPress coding standards. The installed identity is `hsp-calendar-connection/hsp-calendar-connection.php`; preserve existing saved option names and managed-event identifiers.
 
-Run `php tests/run.php` with PHP 8.2 or 8.4 and `python tools/build-release.py` from the repository root. See [tests/README.md](tests/README.md) for isolated synthetic fixtures and optional tests against your own installed Amelia distribution. Do not add paid plugin code, vendor dependencies, credentials, calendar responses or site/customer data to the repository or releases. Do not create real bookings, calendar events, payments or notifications during tests without a separately authorized test flow and cleanup.
+Run `php tests/run.php` with PHP 8.4 and 8.5 and `python tools/build-release.py` from the repository root. See [tests/README.md](tests/README.md) for isolated synthetic fixtures and optional tests against your own installed Amelia distribution. Do not add paid plugin code, vendor dependencies, credentials, calendar responses or site/customer data to the repository or releases. Do not create real bookings, calendar events, payments or notifications during tests without a separately authorized test flow and cleanup.
 
 ## License and required contributions
 

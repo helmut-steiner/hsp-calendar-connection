@@ -6,7 +6,7 @@ Run from the plugin root:
 
 The CLI runner uses PHP_BINARY and isolated subprocesses. It syntax-checks plugin/tests PHP and runs synthetic credentials/discovery, URL/port policy, settings, employee selection and connection isolation, strict free-busy, employee-specific cache/guards, snapshots, conditional storage, durable queue and actual queue/storage recovery fixtures. Multi-employee fixtures include shared destinations, UI-independent routing, old-owner cleanup before transfer and lost-response recovery after native deletion. HTTP, WordPress options, native appointments and advisory locks are stubs. No WordPress installation is bootstrapped and no real calendar, database, email or customer record is used.
 
-The runner limits each subprocess to 20 seconds and 128 KiB of output, with a 120-second overall bound. Use PHP 8.2 or 8.4 with DOM/XML and Sodium or OpenSSL AES-GCM. Load mbstring for the optional overlap suite. Optional extensions already loaded by a parent CLI command are forwarded when their shared module file is available; configuring them in php.ini is preferred. An explicit OpenSSL fallback also runs when available.
+The runner limits each subprocess to 20 seconds and 128 KiB of output, with a 120-second overall bound. Use PHP 8.4 or 8.5 with DOM/XML and Sodium or OpenSSL AES-GCM. Load mbstring for the optional overlap suite. Optional extensions already loaded by a parent CLI command are forwarded when their shared module file is available; configuring them in php.ini is preferred. An explicit OpenSSL fallback also runs when available.
 
 The isolated GitHub updater fixture uses synthetic release responses and site transients. It checks native update/details integration, plugin identity, newer/current/older versions, runtime-only asset selection, preview and unsafe asset refusal, failure caching, unrelated plugin preservation and release-note sanitization. It performs no HTTP requests and does not force WordPress's automatic-installation preference.
 
@@ -25,7 +25,7 @@ PowerShell:
 
 When the environment variable is absent, these suites print SKIP and exit successfully. A supplied unreadable path, unsupported native version or missing prefixed VObject/DOM/mbstring dependency fails rather than pretending that the suite passed. Only selected native classes/request factory and its dependency autoloader run; WordPress and Amelia's plugin bootstrap are not loaded. A fixture future-version mode verifies fail-closed behavior separately.
 
-CI can run the pure suites on PHP 8.2/8.4 with DOM, mbstring and OpenSSL, leaving this environment variable unset. A skipped optional suite does not establish overlap compatibility with a particular Amelia release; run it separately against each supported release.
+CI runs the portable suite on PHP 8.4 and 8.5 with DOM, mbstring and OpenSSL. It leaves this environment variable unset. Run the optional suites separately against each Amelia release you want to verify.
 
 ## Source and release scope
 

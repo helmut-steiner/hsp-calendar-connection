@@ -1,12 +1,12 @@
 # HSP Calendar Connection
 
-Version 0.5.6. Private CalDAV busy-time checks and Amelia appointment writeback, with one connection per employee.
+Version 0.5.7. Private CalDAV busy-time checks and Amelia appointment writeback, with one connection per employee.
 
 HSP Calendar Connection is a separate WordPress plugin. Amelia remains responsible for services, appointments, working hours and notifications. The plugin does not provide appointment availability or replace Amelia's booking interface.
 
 ## Requirements
 
-- WordPress 5.8 or later with PHP 8.0 or later and normal WordPress HTTP/cron support.
+- WordPress 7.1.4 or later with PHP 8.4 or later and normal WordPress HTTP/cron support.
 - PHP DOM/XML and mbstring, plus Sodium or OpenSSL with AES-256-GCM for authenticated credential encryption.
 - Amelia 9.9.1, whose hooks, native repositories and prefixed Sabre VObject classes are the currently validated integration surface.
 - An HTTPS CalDAV server/account that permits discovery and reading all selected busy calendars, plus reading/creating/updating/deleting resources in the selected write calendar.
@@ -83,15 +83,15 @@ The source of truth is [helmut-steiner/hsp-calendar-connection](https://github.c
 
 Install the locked development tools with `composer install`, then run `composer standards` and `composer audit --locked`. CI and release builds use the same reviewed lockfile and keep dependency security checks enabled. Development tools are excluded from the plugin ZIP.
 
-Run the portable tests from the repository root with PHP 8.2 or 8.4 using `php tests/run.php`; see [tests/README.md](tests/README.md). CI runs the synthetic suites on PHP 8.2 and 8.4 with DOM/XML, mbstring and authenticated-encryption extensions. The fixture runner uses newer reflection behavior; these CI runtimes do not change the plugin's declared PHP 8.0 minimum or establish that minimum's runtime compatibility. Optional installed-Amelia suites are skipped unless `HSPCC_AMELIA_PATH` points to a separately obtained installation. CI and releases do not download or redistribute Amelia, its vendor dependencies or license material. Passing synthetic tests does not establish live booking or calendar compatibility.
+Run `php tests/run.php` from the repository root. CI runs the portable suite on PHP 8.4 and 8.5 with DOM/XML, mbstring and authenticated-encryption extensions. The suite uses synthetic booking and calendar fixtures. Optional installed-Amelia suites are skipped unless `HSPCC_AMELIA_PATH` points to a separately obtained installation. See [tests/README.md](tests/README.md).
 
 Build an installable package offline:
 
 ```text
-python tools/build-release.py --tag v0.5.6
+python tools/build-release.py --tag v0.5.7
 ```
 
-The builder checks the tag against the plugin header and readme stable tag. It writes `dist/hsp-calendar-connection-0.5.6.zip` plus a SHA-256 file manifest using an explicit runtime-file allowlist. The archive includes the license, contribution instructions and security policy; it excludes tests, tools, CI files, vendor dependencies and private site data. The `.distignore` file documents exclusions for other packaging tools; the Python allowlist is authoritative.
+The builder checks the tag against the plugin header and readme stable tag. It writes `dist/hsp-calendar-connection-0.5.7.zip` plus a SHA-256 file manifest using an explicit runtime-file allowlist. The archive includes the license, contribution instructions and security policy; it excludes tests, tools, CI files, vendor dependencies and private site data. The `.distignore` file documents exclusions for other packaging tools; the Python allowlist is authoritative.
 
 For each release, update the main plugin `Version` header and `HSPCC_VERSION` constant, `readme.txt` stable tag, this version notice and both changelogs; run tests and build the ZIP before publishing. The builder checks that the runtime constant matches the header. Create a matching `v<version>` tag and GitHub Release in this repository. The Release workflow checks out that tag, reruns the portable tests, verifies metadata and uploads the exact `hsp-calendar-connection-<version>.zip` asset plus its manifest. Manual workflow dispatch also requires an existing matching tag and release. Publishing a release or pushing a tag is a separate maintainer action; repository setup alone does not publish one.
 
@@ -99,7 +99,7 @@ For each release, update the main plugin `Version` header and `HSPCC_VERSION` co
 
 The employee dropdown selects whose connection is being edited. The four section tabs organize that employee's connection, routing, runtime controls and status. Connection settings opens by default; changing employees preserves the current section. Saving forms and running checks returns to the relevant section; successful discovery opens Calendar routing. Switching a tab never saves an incomplete form or contacts the calendar server.
 
-Version 0.5.6 supports fresh installations and existing connections already using current HSP settings, `busySelected` routing, version-2 queue records and `s2:`/`o2:` encrypted credentials. Historical option-name imports, configuration upgrades and old encrypted-password readers have been removed. Installing 0.5.4 alone did not rewrite old encrypted passwords; convert any remaining old credentials with that version before replacing it. Keep a private options backup and the previous ZIP for recovery.
+Version 0.5.7 supports fresh installations and existing connections already using current HSP settings, `busySelected` routing, version-2 queue records and `s2:`/`o2:` encrypted credentials. Historical option-name imports, configuration upgrades and old encrypted-password readers have been removed. Installing 0.5.4 alone did not rewrite old encrypted passwords; convert any remaining old credentials with that version before replacing it. Keep a private options backup and the previous ZIP for recovery.
 
 Install the new ZIP manually, then verify the version, employee dropdown, section tabs, calendar choices and feature state. Keep only one active plugin copy. Deactivation preserves private settings, jobs and mappings. Code rollback does not undo later calendar writes; review unresolved jobs before rollback.
 
